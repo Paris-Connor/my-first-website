@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Dog Running Game</title>
+  <style>
+    body {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      background-color: #cce7ff;
+      font-size: 40px;
+      font-family: sans-serif;
+      overflow: hidden;
+    }
+
+    .game {
+      position: relative;
+      width: 600px;
+      height: 200px;
+      background: #fff;
+      border: 3px solid #333;
+      overflow: hidden;
+    }
+
+    .dog {
+      position: absolute;
+      bottom: 10px;
+      left: 50px;
+      transition: bottom 0.2s;
+    }
+
+    .obstacle {
+      position: absolute;
+      bottom: 10px;
+      right: -50px;
+      animation: moveObstacle 2s linear infinite;
+    }
+
+    @keyframes moveObstacle {
+      from { right: -50px; }
+      to { right: 650px; }
+    }
+  </style>
+</head>
+<body>
+  <div class="game">
+    <div class="dog">🐕</div>
+    <div class="obstacle">🌳</div>
+  </div>
+
+  <script>
+    const dog = document.querySelector('.dog');
+    const obstacle = document.querySelector('.obstacle');
+    let isJumping = false;
+
+    // Jump when pressing space
+    document.body.addEventListener('keydown', (e) => {
+      if (e.code === 'Space' && !isJumping) {
+        isJumping = true;
+        dog.style.bottom = '100px';
+        setTimeout(() => {
+          dog.style.bottom = '10px';
+          isJumping = false;
+        }, 500);
+      }
+    });
+
+    // Check for collision
+    setInterval(() => {
+      const dogBottom = parseInt(window.getComputedStyle(dog).bottom);
+      const obstacleRight = parseInt(window.getComputedStyle(obstacle).right);
+
+      if (obstacleRight > 500 && obstacleRight < 580 && dogBottom < 50) {
+        alert('💥 Game Over! The dog hit the tree.');
+        location.reload();
+      }
+    }, 50);
+  </script>
+</body>
+</html>
