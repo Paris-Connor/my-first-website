@@ -5,12 +5,12 @@
   <title>Cartoon Aquarium</title>
   <style>
     body {
+      margin: 0;
       display: flex;
       justify-content: center;
       align-items: center;
       height: 100vh;
       background: #87ceeb;
-      margin: 0;
     }
 
     .aquarium {
@@ -26,19 +26,19 @@
     /* Fish */
     .fish {
       position: absolute;
-      font-size: 45px;
-      animation: swim-right 12s linear infinite;
+      font-size: 40px;
+      animation: swimR 12s linear infinite;
     }
     .fish.left {
-      animation: swim-left 14s linear infinite;
+      animation: swimL 14s linear infinite;
     }
 
-    @keyframes swim-right {
+    @keyframes swimR {
       from { left: -80px; }
       to { left: 850px; }
     }
 
-    @keyframes swim-left {
+    @keyframes swimL {
       from { left: 850px; transform: scaleX(-1); }
       to { left: -80px; transform: scaleX(-1); }
     }
@@ -56,16 +56,97 @@
       to { bottom: 460px; opacity: 0; }
     }
 
-    /* Wavy sand floor */
+    /* Seaweed */
+    .seaweed {
+      position: absolute;
+      bottom: 80px;
+      font-size: 35px;
+      animation: sway 3s ease-in-out infinite alternate;
+    }
+    @keyframes sway {
+      from { transform: rotate(6deg); }
+      to { transform: rotate(-6deg); }
+    }
+
+    /* Crabs */
+    .crab {
+      position: absolute;
+      bottom: 40px;
+      font-size: 35px;
+      animation: crawl 20s linear infinite;
+    }
+    .crab.reverse {
+      animation: crawlR 25s linear infinite;
+      transform: scaleX(-1);
+    }
+    @keyframes crawl {
+      from { left: -60px; }
+      to { left: 860px; }
+    }
+    @keyframes crawlR {
+      from { left: 860px; }
+      to { left: -60px; }
+    }
+
+    /* Rocks & shells */
+    .rock, .star, .shell {
+      position: absolute;
+      bottom: 40px;
+      font-size: 30px;
+    }
+
+    /* Sand wave container */
     .sand {
       position: absolute;
       bottom: 0;
       width: 100%;
-      height: 80px;
-      background: #f4d27a;
-      clip-path: polygon(
-        0% 60%, 10% 70%, 20% 55%, 30% 75%, 40% 60%, 
-        50% 80%, 60% 65%, 70% 75%, 80% 60%, 90% 70%, 100% 60%, 
-        100% 100%, 0% 100%
-      );
+      height: 120px;
+      overflow: hidden;
     }
+    .sand svg {
+      display: block;
+      width: 100%;
+      height: 120px;
+    }
+  </style>
+</head>
+<body>
+  <div class="aquarium">
+
+    <!-- Fish -->
+    <div class="fish" style="top:100px;">🐟</div>
+    <div class="fish left" style="top:200px;">🐠</div>
+    <div class="fish" style="top:150px; animation-duration:16s;">🐡</div>
+    <div class="fish left" style="top:50px; animation-duration:18s;">🐠</div>
+
+    <!-- Bubbles -->
+    <div class="bubble" style="left:100px; animation-delay:0s;">🫧</div>
+    <div class="bubble" style="left:200px; animation-delay:2s;">🫧</div>
+    <div class="bubble" style="left:300px; animation-delay:4s;">🫧</div>
+    <div class="bubble" style="left:500px; animation-delay:1s;">🫧</div>
+
+    <!-- Seaweed -->
+    <div class="seaweed" style="left:80px;">🌿</div>
+    <div class="seaweed" style="left:150px;">🌿</div>
+    <div class="seaweed" style="left:600px;">🌿</div>
+    <div class="seaweed" style="left:700px;">🌿</div>
+
+    <!-- Crabs -->
+    <div class="crab">🦀</div>
+    <div class="crab reverse">🦀</div>
+
+    <!-- Rocks & shells -->
+    <div class="rock" style="left:250px;">🪨</div>
+    <div class="rock" style="left:400px;">🪨</div>
+    <div class="star" style="left:500px;">⭐</div>
+    <div class="shell" style="left:350px;">🐚</div>
+
+    <!-- Sand with wave -->
+    <div class="sand">
+      <svg viewBox="0 0 800 120" preserveAspectRatio="none">
+        <path d="M0 40 Q100 70 200 40 T400 40 T600 40 T800 40 V120 H0 Z" fill="#f4d27a"/>
+      </svg>
+    </div>
+  </div>
+</body>
+</html>
