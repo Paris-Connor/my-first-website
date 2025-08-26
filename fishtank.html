@@ -9,13 +9,13 @@
       justify-content: center;
       align-items: center;
       height: 100vh;
-      background: #87ceeb; /* light blue background */
+      background: #87ceeb;
       margin: 0;
     }
 
     .aquarium {
       position: relative;
-      width: 600px;
+      width: 700px;
       height: 400px;
       background: linear-gradient(to bottom, #4fc3f7, #01579b);
       border: 10px solid #004d40;
@@ -23,48 +23,111 @@
       overflow: hidden;
     }
 
+    /* Fish */
     .fish {
       position: absolute;
       font-size: 40px;
-      animation: swim 10s linear infinite;
+      animation: swim-right 12s linear infinite;
+    }
+    .fish.reverse {
+      animation: swim-left 14s linear infinite;
+      transform: scaleX(-1); /* flip fish to face left */
     }
 
-    .fish2 {
-      position: absolute;
-      font-size: 50px;
-      animation: swim2 12s linear infinite;
+    @keyframes swim-right {
+      from { left: -80px; top: 80px; }
+      to { left: 750px; top: 100px; }
     }
 
+    @keyframes swim-left {
+      from { left: 750px; top: 250px; }
+      to { left: -80px; top: 230px; }
+    }
+
+    /* Bubbles */
     .bubble {
       position: absolute;
       font-size: 20px;
-      animation: rise 6s linear infinite;
+      bottom: -40px;
       opacity: 0.7;
-    }
-
-    @keyframes swim {
-      from { left: -100px; top: 100px; }
-      to { left: 700px; top: 120px; }
-    }
-
-    @keyframes swim2 {
-      from { left: 700px; top: 250px; transform: scaleX(-1); }
-      to { left: -100px; top: 230px; transform: scaleX(-1); }
+      animation: rise 6s linear infinite;
     }
 
     @keyframes rise {
-      from { bottom: -20px; }
-      to { bottom: 420px; }
+      from { bottom: -40px; opacity: 0.8; }
+      to { bottom: 420px; opacity: 0; }
+    }
+
+    /* Sand */
+    .sand {
+      position: absolute;
+      bottom: 0;
+      width: 100%;
+      height: 60px;
+      background: #f4d27a;
+    }
+
+    /* Seaweed */
+    .seaweed {
+      position: absolute;
+      bottom: 60px;
+      font-size: 35px;
+      animation: sway 3s ease-in-out infinite alternate;
+    }
+
+    @keyframes sway {
+      from { transform: rotate(5deg); }
+      to { transform: rotate(-5deg); }
+    }
+
+    /* Crabs */
+    .crab {
+      position: absolute;
+      bottom: 20px;
+      font-size: 35px;
+      animation: crawl 20s linear infinite;
+    }
+
+    .crab2 {
+      animation: crawl2 25s linear infinite;
+    }
+
+    @keyframes crawl {
+      from { left: -50px; }
+      to { left: 750px; }
+    }
+
+    @keyframes crawl2 {
+      from { left: 750px; transform: scaleX(-1); }
+      to { left: -50px; transform: scaleX(-1); }
     }
   </style>
 </head>
 <body>
   <div class="aquarium">
+    <!-- Fish -->
     <div class="fish">🐟</div>
-    <div class="fish2">🐠</div>
-    <div class="bubble" style="left:100px;">🫧</div>
+    <div class="fish reverse" style="top:200px;">🐠</div>
+    <div class="fish" style="animation-duration:16s; top:150px;">🐡</div>
+    <div class="fish reverse" style="animation-duration:18s; top:50px;">🐠</div>
+
+    <!-- Bubbles -->
+    <div class="bubble" style="left:100px; animation-delay:0s;">🫧</div>
     <div class="bubble" style="left:200px; animation-delay:2s;">🫧</div>
-    <div class="bubble" style="left:400px; animation-delay:4s;">🫧</div>
+    <div class="bubble" style="left:300px; animation-delay:4s;">🫧</div>
+    <div class="bubble" style="left:500px; animation-delay:1s;">🫧</div>
+
+    <!-- Seaweed -->
+    <div class="seaweed" style="left:80px;">🌿</div>
+    <div class="seaweed" style="left:150px;">🌿</div>
+    <div class="seaweed" style="left:600px;">🌿</div>
+
+    <!-- Crabs -->
+    <div class="crab">🦀</div>
+    <div class="crab crab2">🦀</div>
+
+    <!-- Sand -->
+    <div class="sand"></div>
   </div>
 </body>
 </html>
