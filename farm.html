@@ -1,42 +1,100 @@
-<script>
-  const farm = document.getElementById("farm");
-  const crops = ["🌽","🥕","🍅"];
-
-  // Load inventory from localStorage or start fresh
-  let inventory = JSON.parse(localStorage.getItem("inventory")) || [];
-
-  // Create plots
-  for (let i = 0; i < 15; i++) {
-    const plot = document.createElement("div");
-    plot.classList.add("plot");
-    plot.dataset.state = "empty";
-    plot.addEventListener("click", () => handleClick(plot));
-    farm.appendChild(plot);
-  }
-
-  function handleClick(plot) {
-    if (plot.dataset.state === "empty") {
-      // Plant seed
-      plot.textContent = "🌱";
-      plot.dataset.state = "growing";
-
-      // Grow after 3 seconds
-      setTimeout(() => {
-        if (plot.dataset.state === "growing") {
-          const crop = crops[Math.floor(Math.random() * crops.length)];
-          plot.textContent = crop;
-          plot.dataset.state = "grown";
-        }
-      }, 3000);
-
-    } else if (plot.dataset.state === "grown") {
-      // Harvest
-      const crop = plot.textContent;
-      inventory.push(crop);
-      localStorage.setItem("inventory", JSON.stringify(inventory));
-      alert("You harvested " + crop + "!");
-      plot.textContent = "";
-      plot.dataset.state = "empty";
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Farm Game</title>
+  <style>
+    body {
+      margin: 0;
+      background: #87ceeb;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      font-family: sans-serif;
     }
-  }
-</script>
+
+    h1 {
+      margin-bottom: 20px;
+    }
+
+    .farm {
+      display: grid;
+      grid-template-columns: repeat(5, 100px);
+      grid-template-rows: repeat(3, 100px);
+      gap: 10px;
+    }
+
+    .plot {
+      background: #8B4513;
+      border: 3px solid #5A2D0C;
+      border-radius: 10px;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      font-size: 40px;
+      cursor: pointer;
+      user-select: none;
+    }
+
+    .menu {
+      margin-top: 20px;
+    }
+
+    .menu a {
+      font-weight: bold;
+      font-size: 18px;
+      text-decoration: none;
+      color: #333;
+      background: #f4d35e;
+      padding: 8px 14px;
+      border-radius: 10px;
+      border: 2px solid #c99800;
+    }
+
+    .menu a:hover {
+      background: #f0c43d;
+    }
+  </style>
+</head>
+<body>
+  <h1>🌾 My Farm</h1>
+  <div class="farm" id="farm"></div>
+  <div class="menu">
+    <a href="market.html">Go to Market 🛒</a>
+  </div>
+
+  <script>
+    const farm = document.getElementById("farm");
+    const crops = ["🌽","🥕","🍅"];
+
+    // Load inventory or start fresh
+    let inventory = JSON.parse(localStorage.getItem("inventory")) || [];
+
+    // Create plots
+    for (let i = 0; i < 15; i++) {
+      const plot = document.createElement("div");
+      plot.classList.add("plot");
+      plot.dataset.state = "empty";
+      plot.addEventListener("click", () => handleClick(plot));
+      farm.appendChild(plot);
+    }
+
+    function handleClick(plot) {
+      if (plot.dataset.state === "empty") {
+        // Plant seed
+        plot.textContent = "🌱";
+        plot.dataset.state = "growing";
+
+        // Grow after 3 seconds
+        setTimeout(() => {
+          if (plot.dataset.state === "growing") {
+            const crop = crops[Math.floor(Math.random() * crops.length)];
+            plot.textContent = crop;
+            plot.dataset.state = "grown";
+          }
+        }, 3000);
+
+      } else if (plot.dataset.state === "grown") {
+        //
