@@ -27,8 +27,8 @@
     }
 
     .plot {
-      background: #8B4513;
-      border: 3px solid #5A2D0C;
+      background: #8B4513;        /* brown dirt */
+      border: 3px solid #5A2D0C;  /* darker brown border */
       border-radius: 10px;
       display: flex;
       justify-content: center;
@@ -69,10 +69,10 @@
     const farm = document.getElementById("farm");
     const crops = ["🌽","🥕","🍅"];
 
-    // Load inventory or start fresh
+    // Load inventory (shared with market)
     let inventory = JSON.parse(localStorage.getItem("inventory")) || [];
 
-    // Create plots
+    // Create 15 farm plots
     for (let i = 0; i < 15; i++) {
       const plot = document.createElement("div");
       plot.classList.add("plot");
@@ -81,20 +81,4 @@
       farm.appendChild(plot);
     }
 
-    function handleClick(plot) {
-      if (plot.dataset.state === "empty") {
-        // Plant seed
-        plot.textContent = "🌱";
-        plot.dataset.state = "growing";
-
-        // Grow after 3 seconds
-        setTimeout(() => {
-          if (plot.dataset.state === "growing") {
-            const crop = crops[Math.floor(Math.random() * crops.length)];
-            plot.textContent = crop;
-            plot.dataset.state = "grown";
-          }
-        }, 3000);
-
-      } else if (plot.dataset.state === "grown") {
-        //
+    function handleClick(p
