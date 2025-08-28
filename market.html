@@ -57,8 +57,9 @@
 
     .topbar {
       display: flex;
-      justify-content: space-between;
-      width: 420px;
+      flex-direction: column;
+      gap: 6px;
+      width: 460px;
       background: #fff;
       padding: 8px 16px;
       border-radius: 8px;
@@ -71,7 +72,7 @@
       padding: 12px;
       border-radius: 8px;
       margin-bottom: 20px;
-      width: 420px;
+      width: 460px;
     }
 
     .shop-section h3 {
@@ -114,8 +115,21 @@
     </div>
 
     <div class="game-area">
+      <!-- Top bar -->
       <div class="topbar">
         <div>Coins: <span id="coins">0</span> 🪙</div>
+        <div>
+          🐔 <span id="chickens">0</span> |
+          🐄 <span id="cows">0</span> |
+          🐑 <span id="sheep">0</span> |
+          🐖 <span id="pigs">0</span>
+        </div>
+        <div>
+          🥚 <span id="eggs">0</span> |
+          🥛 <span id="milk">0</span> |
+          🧶 <span id="wool">0</span> |
+          🥓 <span id="bacon">0</span>
+        </div>
         <div>
           🌽 <span id="cornSeeds">0</span> |
           🥕 <span id="carrotSeeds">0</span> |
@@ -168,6 +182,14 @@
           <span>🥛 Milk (12🪙)</span>
           <button class="sell-btn" onclick="sellCrop('milk', 12)">Sell</button>
         </div>
+        <div class="item">
+          <span>🧶 Wool (10🪙)</span>
+          <button class="sell-btn" onclick="sellCrop('wool', 10)">Sell</button>
+        </div>
+        <div class="item">
+          <span>🥓 Bacon (15🪙)</span>
+          <button class="sell-btn" onclick="sellCrop('bacon', 15)">Sell</button>
+        </div>
       </div>
     </div>
   </div>
@@ -178,11 +200,21 @@
     const carrotSeedsEl = document.getElementById("carrotSeeds");
     const wheatSeedsEl = document.getElementById("wheatSeeds");
 
+    const chickensEl = document.getElementById("chickens");
+    const cowsEl = document.getElementById("cows");
+    const sheepEl = document.getElementById("sheep");
+    const pigsEl = document.getElementById("pigs");
+
+    const eggsEl = document.getElementById("eggs");
+    const milkEl = document.getElementById("milk");
+    const woolEl = document.getElementById("wool");
+    const baconEl = document.getElementById("bacon");
+
     // Load saved data
     let coins = parseInt(localStorage.getItem("coins")) || 20;
     let seeds = JSON.parse(localStorage.getItem("seeds")) || { corn: 0, carrot: 0, wheat: 0 };
-    let storage = JSON.parse(localStorage.getItem("storage")) || { corn: 0, carrot: 0, wheat: 0, eggs: 0, milk: 0 };
-    let upgrades = JSON.parse(localStorage.getItem("upgrades")) || { barn: false, chickens: 0, cows: 0 };
+    let storage = JSON.parse(localStorage.getItem("storage")) || { corn: 0, carrot: 0, wheat: 0, eggs: 0, milk: 0, wool: 0, bacon: 0 };
+    let upgrades = JSON.parse(localStorage.getItem("upgrades")) || { barn: false, chickens: 0, cows: 0, sheep: 0, pigs: 0 };
 
     function saveGame() {
       localStorage.setItem("coins", coins);
@@ -196,6 +228,16 @@
       cornSeedsEl.textContent = seeds.corn;
       carrotSeedsEl.textContent = seeds.carrot;
       wheatSeedsEl.textContent = seeds.wheat;
+
+      chickensEl.textContent = upgrades.chickens;
+      cowsEl.textContent = upgrades.cows;
+      sheepEl.textContent = upgrades.sheep;
+      pigsEl.textContent = upgrades.pigs;
+
+      eggsEl.textContent = storage.eggs;
+      milkEl.textContent = storage.milk;
+      woolEl.textContent = storage.wool;
+      baconEl.textContent = storage.bacon;
     }
 
     function buySeed(type, price) {
