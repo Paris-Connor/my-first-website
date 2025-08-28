@@ -6,7 +6,7 @@
   <style>
     body {
       font-family: Arial, sans-serif;
-      background: linear-gradient(#a8e6a1, #90ee90);
+      background: linear-gradient(#fff8f0, #ffe0b2); /* matched barn gradient */
       margin: 0;
       padding: 0;
       display: flex;
@@ -143,7 +143,7 @@
 
       <div class="buttons">
         <button onclick="setAction('water')" style="background:#4fc3f7">Water 💧</button>
-        <button onclick="setAction('harvest')" style="background:#ffb74d">Harvest 🌾</button>
+        <button onclick="harvestAll()" style="background:#ffb74d">Harvest All 🌾</button>
       </div>
 
       <div class="farm" id="farm"></div>
@@ -158,7 +158,6 @@
     const wheatSeedsEl = document.getElementById("wheatSeeds");
     const log = document.getElementById("log");
 
-    // Load from localStorage
     let coins = parseInt(localStorage.getItem("coins")) || 20;
     let seeds = JSON.parse(localStorage.getItem("seeds")) || { corn: 2, carrot: 1, wheat: 0 };
     let storage = JSON.parse(localStorage.getItem("storage")) || { corn: 0, carrot: 0, wheat: 0, eggs: 0, milk: 0 };
@@ -205,26 +204,17 @@
         const cornBtn = document.createElement("button");
         cornBtn.textContent = "Plant 🌽";
         cornBtn.disabled = seeds.corn <= 0;
-        cornBtn.onclick = (e) => {
-          e.stopPropagation();
-          plantSeed("corn", plot, div);
-        };
+        cornBtn.onclick = (e) => { e.stopPropagation(); plantSeed("corn", plot, div); };
 
         const carrotBtn = document.createElement("button");
         carrotBtn.textContent = "Plant 🥕";
         carrotBtn.disabled = seeds.carrot <= 0;
-        carrotBtn.onclick = (e) => {
-          e.stopPropagation();
-          plantSeed("carrot", plot, div);
-        };
+        carrotBtn.onclick = (e) => { e.stopPropagation(); plantSeed("carrot", plot, div); };
 
         const wheatBtn = document.createElement("button");
         wheatBtn.textContent = "Plant 🌾";
         wheatBtn.disabled = seeds.wheat <= 0;
-        wheatBtn.onclick = (e) => {
-          e.stopPropagation();
-          plantSeed("wheat", plot, div);
-        };
+        wheatBtn.onclick = (e) => { e.stopPropagation(); plantSeed("wheat", plot, div); };
 
         btns.appendChild(cornBtn);
         btns.appendChild(carrotBtn);
@@ -245,11 +235,6 @@
               div.textContent = plot.type === "corn" ? "🌽" : plot.type === "carrot" ? "🥕" : "🌾";
             }
           }, 2000);
-        } else if (action === "harvest" && plot.state === "grown") {
-          plot.state = "empty";
-          div.textContent = "Soil";
-          storage[plot.type]++;
-          logMessage(`Harvested ${plot.type} and stored it.`);
         } else {
           logMessage("Nothing to do here.");
         }
@@ -276,6 +261,22 @@
         updateUI();
         saveGame();
       }
+    }
+
+    function harvestAll() {
+      let harvested = false;
+      plots.forEach(plot => {
+        if (plot.state === "grown") {
+          plot.state = "empty";
+          plot.el.textContent = "Soil";
+          storage[plot.type]++;
+          logMessage(`Harvested ${plot.type}.`);
+          harvested = true;
+        }
+      });
+      if (!harvested) logMessage("No crops ready to harvest.");
+      updateUI();
+      saveGame();
     }
 
     for (let i = 0; i < 12; i++) createPlot();
