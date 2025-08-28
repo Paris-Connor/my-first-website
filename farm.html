@@ -1,256 +1,76 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="utf-8" />
-<meta name="viewport" content="width=device-width,initial-scale=1" />
-<title>Tiny Farm — Emoji Farming Game</title>
-<style>
-  :root{
-    --bg:#eaf7ea;
-    --panel:#ffffffcc;
-    --accent:#5b8f4a;
-    --muted:#6b6b6b;
-  }
-  *{box-sizing:border-box;font-family:system-ui,-apple-system,Segoe UI,Roboto,Arial;}
-  body{
-    margin:0; min-height:100vh; display:flex; align-items:center; justify-content:center;
-    background: linear-gradient(180deg,#c8f4c8 0%, #e8f9ea 60%);
-    color:#123;
-    padding:20px;
-  }
-  .wrap{
-    width:min(980px,96vw);
-    background:var(--panel); border-radius:12px; box-shadow:0 8px 30px rgba(20,30,20,0.12);
-    padding:16px; display:grid; grid-template-columns: 1fr 320px; gap:16px;
-  }
+  <meta charset="UTF-8">
+  <title>Mini Farming Game</title>
+  <style>
+    body {
+      margin: 0;
+      background: #87ceeb;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      font-family: sans-serif;
+    }
 
-  /* Farm area */
-  .farm {
-    display:grid; grid-template-rows: auto 1fr; gap:12px;
-  }
-  .hud{
-    display:flex; gap:12px; align-items:center; justify-content:space-between;
-  }
-  .hud .left{display:flex; gap:8px; align-items:center;}
-  .stat { background:rgba(255,255,255,0.5); padding:8px 12px; border-radius:10px; font-weight:700;}
-  .buttons { display:flex; gap:8px; align-items:center; }
+    .farm {
+      display: grid;
+      grid-template-columns: repeat(5, 100px);
+      grid-template-rows: repeat(3, 100px);
+      gap: 10px;
+    }
 
-  .grid {
-    background: linear-gradient(180deg,#bde0b9,#a3d08f);
-    padding:14px; border-radius:10px; display:grid;
-    grid-template-columns: repeat(3,1fr); grid-auto-rows: 120px; gap:12px;
-    align-items:stretch;
-  }
-
-  .plot {
-    background: linear-gradient(180deg,#8fbf74,#6aa24d);
-    border-radius:10px; position:relative; display:flex; align-items:center; justify-content:center;
-    font-size:38px; cursor:pointer; user-select:none;
-    box-shadow: inset 0 -6px 12px rgba(0,0,0,0.08);
-  }
-  .plot .ground {
-    position:absolute; bottom:8px; left:8px; right:8px; height:30px; border-radius:6px;
-    background: linear-gradient(180deg,#d2b07c,#b4854f); opacity:0.95; font-size:16px; display:flex;
-    align-items:center; justify-content:center; color:#4b2f1a; box-shadow: 0 4px 0 rgba(0,0,0,0.06) inset;
-  }
-  .plot.empty { background: linear-gradient(180deg,#9fd881,#79c25a); }
-  .plot.locked { opacity:0.45; filter:grayscale(.2); }
-
-  .sidebar{
-    background:linear-gradient(180deg,#ffffff,#f6fff6); border-radius:10px; padding:12px; height:100%;
-    display:flex; flex-direction:column; gap:12px;
-  }
-  h2{margin:0 0 6px 0; font-size:18px;}
-  .controls{display:flex; gap:8px; flex-wrap:wrap;}
-  button.tool {
-    padding:10px 12px; border-radius:10px; border:none; background:var(--accent); color:white; font-weight:700;
-    cursor:pointer; box-shadow:0 3px 0 rgba(0,0,0,0.12);
-  }
-  button.tool.secondary { background:#8fbf7a; color:#083; }
-  button.tool:disabled { opacity:0.5; transform:translateY(0); cursor:not-allowed; }
-
-  .log { flex:1; background:#fff7; border-radius:8px; padding:8px; overflow:auto; font-size:13px; color:var(--muted); }
-  .help { font-size:13px; color:var(--muted); }
-
-  footer { grid-column:1 / -1; text-align:center; font-size:13px; color:#4b4b4b; margin-top:8px; }
-
-  /* small screens */
-  @media (max-width:820px){
-    .wrap{ grid-template-columns: 1fr; }
-    .sidebar{ order: -1; }
-    .grid { grid-template-columns: repeat(3, 1fr); }
-  }
-</style>
+    .plot {
+      background: #8B4513;
+      border: 3px solid #5A2D0C;
+      border-radius: 10px;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      font-size: 40px;
+      cursor: pointer;
+      user-select: none;
+    }
+  </style>
 </head>
 <body>
-  <div class="wrap" role="application" aria-label="Tiny Farm game">
-    <div class="farm">
-      <div class="hud" aria-hidden="false">
-        <div class="left">
-          <div class="stat">Seeds: <span id="seedCount">5</span> 🌱</div>
-          <div class="stat">Coins: <span id="coins">0</span> 🪙</div>
-        </div>
-        <div class="buttons">
-          <button class="tool" id="btnPlant">Plant</button>
-          <button class="tool secondary" id="btnWater">Water</button>
-          <button class="tool" id="btnHarvest">Harvest</button>
-          <button class="tool secondary" id="btnBuySeed">Buy Seed (5💰)</button>
-        </div>
-      </div>
+  <div class="farm" id="farm"></div>
 
-      <div class="grid" id="grid" aria-label="Farm plots">
-        <!-- plots injected by JS -->
-      </div>
+  <script>
+    const farm = document.getElementById("farm");
+    const crops = ["🌽","🥕","🍅"];
 
-      <footer>Click or tap a plot to interact. Plant → Water → Harvest. Plants grow over time. Saved in your browser.</footer>
-    </div>
+    // Create plots
+    for (let i = 0; i < 15; i++) {
+      const plot = document.createElement("div");
+      plot.classList.add("plot");
+      plot.dataset.state = "empty";
+      plot.addEventListener("click", () => handleClick(plot));
+      farm.appendChild(plot);
+    }
 
-    <aside class="sidebar" aria-label="Game sidebar">
-      <div>
-        <h2>Your Farm</h2>
-        <div class="help">Plant seeds and water them. Water speeds growth. Harvest mature crops for coins. Use coins to buy more seeds.</div>
-      </div>
+    function handleClick(plot) {
+      if (plot.dataset.state === "empty") {
+        // Plant seed
+        plot.textContent = "🌱";
+        plot.dataset.state = "growing";
 
-      <div>
-        <h2>Crop Info</h2>
-        <div class="log" id="log">
-          <div>Welcome to Tiny Farm! You start with 5 seeds. 🌱</div>
-        </div>
-      </div>
-
-      <div>
-        <h2>Quick Tips</h2>
-        <div class="help">
-          • Tap "Plant" then a plot to plant a seed.<br>
-          • Water a planted plot to speed it up.<br>
-          • Harvest when you see the crop emoji (e.g., 🌽 / 🍅).<br>
-          • Everything is saved automatically.
-        </div>
-      </div>
-    </aside>
-  </div>
-
-<script>
-/*
- Tiny Farm — single file
- Plots: grid of plots, each plot has a state:
-  - empty
-  - planted: timestamp, watered flag, stage (0..3)
- Growth rules:
-  - Each stage takes BASE_GROW ms, watering subtracts WATER_SPEED ms from remaining.
-  - Stage progression computed from elapsed time + water bonus.
-*/
-
-const GRID_ROWS = 4;
-const GRID_COLS = 3;
-const TOTAL_PLOTS = GRID_ROWS * GRID_COLS;
-const STORAGE_KEY = 'tinyfarm_v1';
-
-// gameplay tuning
-const BASE_STAGE_MS = 20 * 1000; // 20s per stage for demo (you can increase)
-const STAGES = 3; // 0 seed, 1 sprout, 2 plant, 3 harvestable
-const WATER_BONUS_MS = 8 * 1000; // watering speeds by 8s (applied to remaining)
-const HARVEST_REWARD = 3; // coins per harvest
-const SEED_COST = 5; // coins to buy a seed
-
-// emojis for stages
-const CROP_EMOJIS = ['🌱','🌿','🌾','🌽']; // you can change last to any crop emoji
-
-// UI refs
-const gridEl = document.getElementById('grid');
-const seedCountEl = document.getElementById('seedCount');
-const coinsEl = document.getElementById('coins');
-const logEl = document.getElementById('log');
-const btnPlant = document.getElementById('btnPlant');
-const btnWater = document.getElementById('btnWater');
-const btnHarvest = document.getElementById('btnHarvest');
-const btnBuySeed = document.getElementById('btnBuySeed');
-
-let state = {
-  seeds: 5,
-  coins: 0,
-  selectedAction: null, // 'plant' | 'water' | 'harvest' | null
-  plots: [] // array length TOTAL_PLOTS
-};
-
-// load or init
-function loadState(){
-  const raw = localStorage.getItem(STORAGE_KEY);
-  if(raw){
-    try{
-      const parsed = JSON.parse(raw);
-      // validate minimal structure
-      if(parsed.plots && parsed.plots.length === TOTAL_PLOTS){
-        state = parsed;
-        return;
+        // Grow after 3 seconds
+        setTimeout(() => {
+          if (plot.dataset.state === "growing") {
+            const crop = crops[Math.floor(Math.random() * crops.length)];
+            plot.textContent = crop;
+            plot.dataset.state = "grown";
+          }
+        }, 3000);
+      } else if (plot.dataset.state === "grown") {
+        // Harvest
+        alert("You harvested " + plot.textContent + "!");
+        plot.textContent = "";
+        plot.dataset.state = "empty";
       }
-    }catch(e){}
-  }
-  // init blank
-  state = {
-    seeds: 5,
-    coins: 0,
-    selectedAction: null,
-    plots: Array.from({length:TOTAL_PLOTS}, ()=>({
-      status:'empty', // or 'planted'
-      plantedAt: 0,
-      wateredAt: 0,
-      waterCount: 0,
-      // optional: lastStage computed
-    }))
-  };
-}
-function saveState(){
-  localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
-}
-
-// UI create
-function makePlotEl(i, plot){
-  const el = document.createElement('div');
-  el.className = 'plot' + (plot.status === 'empty' ? ' empty' : '');
-  el.dataset.index = i;
-  // ground label at bottom
-  const ground = document.createElement('div');
-  ground.className = 'ground';
-  ground.textContent = 'soil';
-  el.appendChild(ground);
-
-  const content = document.createElement('div');
-  content.className = 'content';
-  content.style.fontSize = '42px';
-  el.appendChild(content);
-
-  // show initial content
-  updatePlotElement(el, plot);
-
-  // click handler
-  el.addEventListener('click', ()=>onPlotClick(i));
-  return el;
-}
-
-// compute stage from plantedAt + water effects
-function computeStage(plot){
-  if(plot.status !== 'planted') return -1;
-  const now = Date.now();
-  const elapsed = Math.max(0, now - plot.plantedAt);
-  // effective growth time reduced by watering
-  const effectiveElapsed = elapsed + (plot.waterCount * WATER_BONUS_MS);
-  const stage = Math.floor(effectiveElapsed / BASE_STAGE_MS);
-  return Math.min(stage, STAGES);
-}
-
-function updatePlotElement(el, plot){
-  const content = el.querySelector('.content');
-  const ground = el.querySelector('.ground');
-  if(plot.status === 'empty'){
-    el.classList.add('empty');
-    content.textContent = '🟫';
-    ground.textContent = 'soil';
-  }else if(plot.status === 'planted'){
-    el.classList.remove('empty');
-    const stage = computeStage(plot);
-    if(stage <= 0){
-      content.textContent = CROP_EMOJIS[0]; // seedling
-      ground.textContent = 'planted';
-    } else if(stage < STAGES){
-      cont
+    }
+  </script>
+</body>
+</html>
