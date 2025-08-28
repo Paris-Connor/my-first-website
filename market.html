@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
+  <meta charset="UTF-8" />
   <title>Market</title>
   <style>
     body {
@@ -46,6 +46,7 @@
       color: white;
       font-weight: bold;
       cursor: pointer;
+      font-size: 16px;
     }
 
     .game-area {
@@ -109,9 +110,9 @@
   <div class="container">
     <div class="sidebar">
       <h2>Market 🏪</h2>
-      <p>Buy seeds, animals & sell goods.</p>
-      <button class="farm-btn" onclick="goToFarm()">Return to Farm 🌱</button>
-      <button class="barn-btn" onclick="goToBarn()">Go to Barn 🐔</button>
+      <p>Buy seeds, buy animals, sell crops & goods.</p>
+      <button class="farm-btn" id="btnFarm">Return to Farm 🌱</button>
+      <button class="barn-btn" id="btnBarn">Go to Barn 🐔</button>
     </div>
 
     <div class="game-area">
@@ -156,22 +157,22 @@
 
       <!-- Buy Animals -->
       <div class="shop-section">
-        <h3>🐮 Buy Farm Animals</h3>
+        <h3>🐄 Buy Animals</h3>
         <div class="item">
-          <span>🐔 Chicken (15🪙)</span>
-          <button class="buy-btn" onclick="buyAnimal('chickens', 15)">Buy</button>
+          <span>🐔 Chicken (50🪙)</span>
+          <button class="buy-btn" onclick="buyAnimal('chickens', 50)">Buy</button>
         </div>
         <div class="item">
-          <span>🐄 Cow (30🪙)</span>
-          <button class="buy-btn" onclick="buyAnimal('cows', 30)">Buy</button>
+          <span>🐄 Cow (100🪙)</span>
+          <button class="buy-btn" onclick="buyAnimal('cows', 100)">Buy</button>
         </div>
         <div class="item">
-          <span>🐑 Sheep (25🪙)</span>
-          <button class="buy-btn" onclick="buyAnimal('sheep', 25)">Buy</button>
+          <span>🐑 Sheep (80🪙)</span>
+          <button class="buy-btn" onclick="buyAnimal('sheep', 80)">Buy</button>
         </div>
         <div class="item">
-          <span>🐖 Pig (40🪙)</span>
-          <button class="buy-btn" onclick="buyAnimal('pigs', 40)">Buy</button>
+          <span>🐖 Pig (90🪙)</span>
+          <button class="buy-btn" onclick="buyAnimal('pigs', 90)">Buy</button>
         </div>
       </div>
 
@@ -216,6 +217,7 @@
   </div>
 
   <script>
+    // Get elements
     const coinsEl = document.getElementById("coins");
     const cornSeedsEl = document.getElementById("cornSeeds");
     const carrotSeedsEl = document.getElementById("carrotSeeds");
@@ -227,22 +229,17 @@
     const pigsEl = document.getElementById("pigs");
 
     const eggsEl = document.getElementById("eggs");
-        const eggsEl = document.getElementById("eggs");
     const milkEl = document.getElementById("milk");
     const woolEl = document.getElementById("wool");
     const baconEl = document.getElementById("bacon");
 
-    // Load saved data
+    // Load saved data or default values
     let coins = parseInt(localStorage.getItem("coins")) || 20;
     let seeds = JSON.parse(localStorage.getItem("seeds")) || { corn: 0, carrot: 0, wheat: 0 };
-    let storage = JSON.parse(localStorage.getItem("storage")) || {
-      corn: 0, carrot: 0, wheat: 0,
-      eggs: 0, milk: 0, wool: 0, bacon: 0
-    };
-    let upgrades = JSON.parse(localStorage.getItem("upgrades")) || {
-      barn: false, chickens: 0, cows: 0, sheep: 0, pigs: 0
-    };
+    let storage = JSON.parse(localStorage.getItem("storage")) || { corn: 0, carrot: 0, wheat: 0, eggs: 0, milk: 0, wool: 0, bacon: 0 };
+    let upgrades = JSON.parse(localStorage.getItem("upgrades")) || { barn: false, chickens: 0, cows: 0, sheep: 0, pigs: 0 };
 
+    // Save data to localStorage
     function saveGame() {
       localStorage.setItem("coins", coins);
       localStorage.setItem("seeds", JSON.stringify(seeds));
@@ -250,9 +247,9 @@
       localStorage.setItem("upgrades", JSON.stringify(upgrades));
     }
 
+    // Update UI to reflect current data
     function updateUI() {
       coinsEl.textContent = coins;
-
       cornSeedsEl.textContent = seeds.corn;
       carrotSeedsEl.textContent = seeds.carrot;
       wheatSeedsEl.textContent = seeds.wheat;
@@ -268,6 +265,7 @@
       baconEl.textContent = storage.bacon;
     }
 
+    // Buy seeds function
     function buySeed(type, price) {
       if (coins >= price) {
         coins -= price;
@@ -279,17 +277,7 @@
       }
     }
 
-    function buyAnimal(type, price) {
-      if (coins >= price) {
-        coins -= price;
-        upgrades[type]++;
-        updateUI();
-        saveGame();
-      } else {
-        alert("Not enough coins to buy this animal!");
-      }
-    }
-
+    // Sell crop or product function
     function sellCrop(type, price) {
       if (storage[type] > 0) {
         storage[type]--;
@@ -301,17 +289,30 @@
       }
     }
 
-    function goToFarm() {
+    // Buy animals function
+    function buyAnimal(type, price) {
+      if (coins >= price) {
+        coins -= price;
+        upgrades[type]++;
+        updateUI();
+        saveGame();
+      } else {
+        alert("Not enough coins to buy this animal!");
+      }
+    }
+
+    // Navigation button event handlers
+    document.getElementById("btnFarm").addEventListener("click", () => {
       saveGame();
       window.location.href = "farm.html";
-    }
+    });
 
-    function goToBarn() {
+    document.getElementById("btnBarn").addEventListener("click", () => {
       saveGame();
       window.location.href = "barn.html";
-    }
+    });
 
-    // Initial UI update
+    // Initial UI update on page load
     updateUI();
   </script>
 </body>
