@@ -5,66 +5,105 @@
   <title>Market</title>
   <style>
     body {
+      font-family: Arial, sans-serif;
+      background: linear-gradient(#fff9e6, #ffe0b2);
       margin: 0;
-      background: #f4e1c1;
-      font-family: sans-serif;
+      padding: 0;
       display: flex;
-      flex-direction: column;
-      align-items: center;
+      justify-content: center;
+      align-items: flex-start;
+      height: 100vh;
+    }
+
+    .container {
+      margin: 40px;
+      background: #ffffffdd;
+      border-radius: 12px;
       padding: 20px;
+      box-shadow: 0px 4px 12px rgba(0,0,0,0.2);
+      width: 400px;
     }
 
-    h1 {
-      margin-bottom: 10px;
-    }
-
-    .inventory {
-      display: flex;
-      gap: 10px;
-      flex-wrap: wrap;
-      margin: 20px 0;
+    h2 {
+      margin-top: 0;
     }
 
     .crop {
-      font-size: 40px;
-      cursor: pointer;
-      border: 2px solid #555;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 8px;
+      margin-bottom: 10px;
+      background: #f7f7f7;
       border-radius: 8px;
-      padding: 5px;
-      background: #fff;
-      transition: transform 0.2s;
     }
 
-    .crop:hover {
-      transform: scale(1.2);
-    }
-
-    .money {
-      font-size: 24px;
+    button {
+      padding: 6px 12px;
+      border: none;
+      border-radius: 6px;
+      background: #ff9800;
+      color: white;
       font-weight: bold;
-      margin-bottom: 20px;
-    }
-
-    .menu a {
-      font-weight: bold;
-      font-size: 18px;
-      text-decoration: none;
-      color: #333;
-      background: #f4d35e;
-      padding: 8px 14px;
-      border-radius: 10px;
-      border: 2px solid #c99800;
-    }
-
-    .menu a:hover {
-      background: #f0c43d;
+      cursor: pointer;
     }
   </style>
 </head>
 <body>
-  <h1>Farm Market 🛒</h1>
-  <p>Click a crop to sell it!</p>
-  <div class="inventory" id="inventory"></div>
-  <div class="money" id="money">Money: $0</div>
+  <div class="container">
+    <h2>🌽 Market</h2>
+    <p>Coins: <span id="coins">0</span> 🪙</p>
+    <div id="inventory"></div>
+    <button onclick="goBack()">⬅️ Back to Farm</button>
+  </div>
 
-  <div clas
+  <script>
+    const coinsEl = document.getElementById("coins");
+    const invEl = document.getElementById("inventory");
+
+    let coins = parseInt(localStorage.getItem("coins")) || 0;
+    let inventory = JSON.parse(localStorage.getItem("inventory")) || {};
+
+    function updateUI() {
+      coinsEl.textContent = coins;
+      invEl.innerHTML = "";
+
+      for (let crop in inventory) {
+        const amount = inventory[crop];
+        if (amount > 0) {
+          const div = document.createElement("div");
+          div.className = "crop";
+          div.innerHTML = `
+            ${crop} x${amount}
+            <button onclick="sell('${crop}')">Sell</button>
+          `;
+          invEl.appendChild(div);
+        }
+      }
+
+      if (Object.keys(inventory).length === 0) {
+        invEl.innerHTML = "<p>No crops yet.</p>";
+      }
+    }
+
+    function sell(crop) {
+      if (inventory[crop] > 0) {
+        inventory[crop]--;
+        coins += 5; // price for corn
+        localStorage.setItem("coins", coins);
+        localStorage.setItem("inventory", JSON.stringify(inventory));
+        updateUI();
+      }
+    }
+
+    function goBack() {
+      localStorage.setItem("coins", coins);
+      localStorage.setItem("inventory", JSON.stringify(inventory));
+      window.location.href = "farm.html";
+    }
+
+    updateUI();
+  </script>
+</body>
+</html>
+
