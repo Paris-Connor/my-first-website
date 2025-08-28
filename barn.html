@@ -1,0 +1,234 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Barn</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: linear-gradient(#dcedc8, #aed581);
+      margin: 0;
+      padding: 0;
+      display: flex;
+      justify-content: center;
+      align-items: flex-start;
+      height: 100vh;
+    }
+
+    .container {
+      display: flex;
+      background: #ffffffdd;
+      border-radius: 12px;
+      margin: 40px;
+      box-shadow: 0px 4px 12px rgba(0,0,0,0.2);
+      overflow: hidden;
+    }
+
+    .sidebar {
+      width: 220px;
+      background: #fffaf5;
+      padding: 20px;
+      border-right: 2px solid #ccc;
+    }
+
+    .sidebar h2 { margin-top: 0; }
+
+    .nav-btn {
+      margin-top: 10px;
+      display: block;
+      width: 100%;
+      padding: 10px;
+      border: none;
+      border-radius: 8px;
+      background: #6d4c41;
+      color: white;
+      font-weight: bold;
+      cursor: pointer;
+    }
+
+    .game-area {
+      padding: 20px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+
+    .topbar {
+      display: flex;
+      justify-content: space-between;
+      width: 420px;
+      background: #fff;
+      padding: 8px 16px;
+      border-radius: 8px;
+      margin-bottom: 20px;
+      font-weight: bold;
+    }
+
+    .section {
+      margin-bottom: 20px;
+      padding: 15px;
+      background: #fff8e1;
+      border-radius: 10px;
+      width: 420px;
+      box-shadow: inset 0 0 6px rgba(0,0,0,0.1);
+    }
+
+    .section h3 { margin-top: 0; }
+
+    .animals {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 15px;
+    }
+
+    .animal {
+      width: 100px;
+      height: 100px;
+      background: #f1f8e9;
+      border-radius: 10px;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      cursor: pointer;
+      font-size: 40px;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.2);
+      transition: transform 0.2s;
+    }
+
+    .animal:hover { transform: scale(1.1); }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="sidebar">
+      <h2>Barn 🐔</h2>
+      <p>Buy animals and collect products.</p>
+      <button class="nav-btn" onclick="goToFarm()">Return to Farm 🌱</button>
+      <button class="nav-btn" onclick="goToMarket()">Go to Market 🏪</button>
+    </div>
+
+    <div class="game-area">
+      <div class="topbar">
+        <div>Coins: <span id="coins">0</span> 🪙</div>
+        <div>Products: 🥚 <span id="eggs">0</span>, 🥛 <span id="milk">0</span></div>
+      </div>
+
+      <div class="section" id="barn-section">
+        <!-- Barn purchase or animals will appear here -->
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const coinsEl = document.getElementById("coins");
+    const eggsEl = document.getElementById("eggs");
+    const milkEl = document.getElementById("milk");
+    const barnSection = document.getElementById("barn-section");
+
+    let coins = parseInt(localStorage.getItem("coins")) || 0;
+    let storage = JSON.parse(localStorage.getItem("storage")) || { corn:0, carrot:0, wheat:0, eggs:0, milk:0 };
+    let upgrades = JSON.parse(localStorage.getItem("upgrades")) || { barn:false, chickens:0, cows:0 };
+
+    function saveGame() {
+      localStorage.setItem("coins", coins);
+      localStorage.setItem("storage", JSON.stringify(storage));
+      localStorage.setItem("upgrades", JSON.stringify(upgrades));
+    }
+
+    function updateUI() {
+      coinsEl.textContent = coins;
+      eggsEl.textContent = storage.eggs;
+      milkEl.textContent = storage.milk;
+
+      if (!upgrades.barn) {
+        barnSection.innerHTML = `
+          <h3>Buy Barn</h3>
+          <p>Unlock the barn to raise animals. Cost: 50🪙</p>
+          <button onclick="buyBarn()">Buy Barn</button>
+        `;
+      } else {
+        barnSection.innerHTML = `
+          <h3>Your Animals</h3>
+          <p>Chickens: ${upgrades.chickens}, Cows: ${upgrades.cows}</p>
+          <button onclick="buyChicken()">Buy Chicken (10🪙)</button>
+          <button onclick="buyCow()">Buy Cow (30🪙)</button>
+          <div class="animals" id="animal-list"></div>
+        `;
+
+        const list = document.getElementById("animal-list");
+
+        for (let i = 0; i < upgrades.chickens; i++) {
+          const chicken = document.createElement("div");
+          chicken.className = "animal";
+          chicken.textContent = "🐔";
+          chicken.onclick = () => {
+            storage.eggs++;
+            saveGame();
+            updateUI();
+            alert("You collected 1 egg!");
+          };
+          list.appendChild(chicken);
+        }
+
+        for (let i = 0; i < upgrades.cows; i++) {
+          const cow = document.createElement("div");
+          cow.className = "animal";
+          cow.textContent = "🐄";
+          cow.onclick = () => {
+            storage.milk++;
+            saveGame();
+            updateUI();
+            alert("You collected 1 milk!");
+          };
+          list.appendChild(cow);
+        }
+      }
+    }
+
+    function buyBarn() {
+      if (coins >= 50) {
+        coins -= 50;
+        upgrades.barn = true;
+        saveGame();
+        updateUI();
+      } else {
+        alert("Not enough coins to buy the barn!");
+      }
+    }
+
+    function buyChicken() {
+      if (coins >= 10) {
+        coins -= 10;
+        upgrades.chickens++;
+        saveGame();
+        updateUI();
+      } else {
+        alert("Not enough coins!");
+      }
+    }
+
+    function buyCow() {
+      if (coins >= 30) {
+        coins -= 30;
+        upgrades.cows++;
+        saveGame();
+        updateUI();
+      } else {
+        alert("Not enough coins!");
+      }
+    }
+
+    function goToFarm() {
+      saveGame();
+      window.location.href = "farm.html";
+    }
+
+    function goToMarket() {
+      saveGame();
+      window.location.href = "market.html";
+    }
+
+    updateUI();
+  </script>
+</body>
+</html>
