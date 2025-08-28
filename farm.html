@@ -138,11 +138,22 @@
     const coinsEl = document.getElementById("coins");
     const log = document.getElementById("log");
 
+    // --- Load game state safely ---
     let seeds = parseInt(localStorage.getItem("seeds")) || 2;
     let coins = parseInt(localStorage.getItem("coins")) || 10;
-    let storage = JSON.parse(localStorage.getItem("storage")) || { corn: 0 };
-    let action = "plant";
 
+    let storage;
+    try {
+      storage = JSON.parse(localStorage.getItem("storage"));
+      if (!storage || typeof storage.corn !== "number") {
+        storage = { corn: 0 };
+      }
+    } catch (e) {
+      console.warn("Storage data corrupted, resetting.", e);
+      storage = { corn: 0 };
+    }
+
+    let action = "plant";
     const plots = [];
 
     function saveGame() {
@@ -154,6 +165,7 @@
     function logMessage(msg) {
       const time = new Date().toLocaleTimeString();
       log.innerHTML = `[${time}] ${msg}<br>` + log.innerHTML;
+      console.log(msg); // debug log for GitHub Pages
     }
 
     function updateUI() {
@@ -229,6 +241,7 @@
     }
 
     updateUI();
+    console.log("Farm game loaded with:", { seeds, coins, storage });
   </script>
 </body>
 </html>
