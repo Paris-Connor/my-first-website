@@ -5,37 +5,40 @@
   <title>Farm Game</title>
   <style>
     body {
+      background: #90ee90; /* green grass background */
+      font-family: Arial, sans-serif;
+      text-align: center;
       margin: 0;
-      background: #87ceeb;
-      display: flex;
-      flex-direction: column;
-      justify-content: center;
-      align-items: center;
-      height: 100vh;
-      font-family: sans-serif;
+      padding: 20px;
     }
 
     h1 {
+      margin-bottom: 10px;
+    }
+
+    p {
       margin-bottom: 20px;
     }
 
     .farm {
       display: grid;
-      grid-template-columns: repeat(5, 100px);
-      grid-template-rows: repeat(3, 100px);
-      gap: 10px;
+      grid-template-columns: repeat(5, 80px);
+      grid-gap: 10px;
+      justify-content: center;
+      margin: 20px auto;
     }
 
     .plot {
-      background: #8B4513;        /* brown dirt */
-      border: 3px solid #5A2D0C;  /* darker brown border */
-      border-radius: 10px;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      font-size: 40px;
+      width: 80px;
+      height: 80px;
+      background: #8b4513;   /* dirt brown */
+      border: 2px solid #654321;
+      border-radius: 8px;
       cursor: pointer;
-      user-select: none;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 32px;
     }
 
     .menu {
@@ -59,20 +62,23 @@
   </style>
 </head>
 <body>
-  <h1>🌾 My Farm</h1>
+  <h1>🌱 Simple Farm Game</h1>
+  <p>Click a plot to plant crops. Wait, then click again to harvest!</p>
+
   <div class="farm" id="farm"></div>
+
   <div class="menu">
     <a href="market.html">Go to Market 🛒</a>
   </div>
 
   <script>
     const farm = document.getElementById("farm");
-    const crops = ["🌽","🥕","🍅"];
+    const crops = ["🌽", "🥕", "🍅"];
 
-    // Load inventory (shared with market)
+    // Shared inventory with market
     let inventory = JSON.parse(localStorage.getItem("inventory")) || [];
 
-    // Create 15 farm plots
+    // Create 15 plots
     for (let i = 0; i < 15; i++) {
       const plot = document.createElement("div");
       plot.classList.add("plot");
@@ -81,4 +87,32 @@
       farm.appendChild(plot);
     }
 
-    function handleClick(p
+    function handleClick(plot) {
+      if (plot.dataset.state === "empty") {
+        // Plant seed
+        plot.textContent = "🌱";
+        plot.dataset.state = "growing";
+
+        // Grow crop after 3 seconds
+        setTimeout(() => {
+          if (plot.dataset.state === "growing") {
+            const crop = crops[Math.floor(Math.random() * crops.length)];
+            plot.textContent = crop;
+            plot.dataset.state = "grown";
+          }
+        }, 3000);
+
+      } else if (plot.dataset.state === "grown") {
+        // Harvest crop
+        const crop = plot.textContent;
+        inventory.push(crop);
+        localStorage.setItem("inventory", JSON.stringify(inventory));
+
+        // Reset plot
+        plot.textContent = "";
+        plot.dataset.state = "empty";
+      }
+    }
+  </script>
+</body>
+</html>
