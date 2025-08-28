@@ -148,4 +148,154 @@
     <div class="sidebar">
       <h2>Farm 🌱</h2>
       <p>Plant and grow crops here.</p>
-      <button class="barn-btn" onclick="goToBarn()">Go to Barn 🐔</butto
+      <button class="barn-btn" onclick="goToBarn()">Go to Barn 🐔</button>
+      <button class="market-btn" onclick="goToMarket()">Go to Market 🏪</button>
+    </div>
+
+    <!-- Game Area -->
+    <div class="game-area">
+      <div class="topbar">
+        <div>
+          Coins: <span id="coins">0</span> 🪙 |
+          🌾 <span id="wheat">0</span> |
+          🌽 <span id="corn">0</span> |
+          🥕 <span id="carrots">0</span>
+        </div>
+        <div class="controls">
+          <button class="control-btn" onclick="waterAll()">💧 Water All</button>
+          <button class="control-btn" onclick="harvestAll()">✅ Harvest All</button>
+        </div>
+      </div>
+
+      <div class="field" id="field"></div>
+    </div>
+  </div>
+
+  <script>
+    const coinsEl = document.getElementById("coins");
+    const wheatEl = document.getElementById("wheat");
+    const cornEl = document.getElementById("corn");
+    const carrotsEl = document.getElementById("carrots");
+    const fieldEl = document.getElementById("field");
+
+    let coins = parseInt(localStorage.getItem("coins")) || 20;
+    let storage = JSON.parse(localStorage.getItem("storage")) || { wheat: 0, corn: 0, carrots: 0 };
+    let field = JSON.parse(localStorage.getItem("field")) || Array(9).fill(null);
+
+    function saveGame() {
+      localStorage.setItem("coins", coins);
+      localStorage.setItem("storage", JSON.stringify(storage));
+      localStorage.setItem("field", JSON.stringify(field));
+    }
+
+    function updateUI() {
+      coinsEl.textContent = coins;
+      wheatEl.textContent = storage.wheat;
+      cornEl.textContent = storage.corn;
+      carrotsEl.textContent = storage.carrots;
+      renderField();
+    }
+
+    function renderField() {
+      fieldEl.innerHTML = "";
+      field.forEach((plot, index) => {
+        const div = document.createElement("div");
+        div.className = "plot";
+
+        if (plot) {
+          div.classList.add(plot.type);
+          if (plot.watered) div.classList.add("watered");
+
+          const cropEmoji = {
+            wheat: "🌾",
+            corn: "🌽",
+            carrot: "🥕"
+          }[plot.type];
+
+          if (plot.grown) {
+            div.textContent = `✅ ${cropEmoji}`;
+          } else {
+            div.textContent = plot.watered ? "💧" : cropEmoji;
+          }
+
+          div.onclick = () => {
+            if (!plot.grown && !plot.watered) {
+              water(index);
+            }
+          };
+        } else {
+          div.onclick = (e) => showCropSelector(e, index);
+        }
+
+        fieldEl.appendChild(div);
+      });
+    }
+
+    function showCropSelector(e, index) {
+      // Remove existing selectors
+      document.querySelectorAll('.crop-selector').forEach(el => el.remove());
+
+      const selector = document.createElement("div");
+      selector.className = "crop-selector";
+
+      ["wheat", "corn", "carrot"].forEach(crop => {
+        const btn = document.createElement("button");
+        btn.className = "crop-btn";
+        btn.textContent = crop;
+        btn.onclick = (event) => {
+          event.stopPropagation();
+          plantCrop(index, crop);
+          selector.remove();
+        };
+        selector.appendChild(btn);
+      });
+
+      e.currentTarget.appendChild(selector);
+    }
+
+    function plantCrop(index, crop) {
+      field[index] = { type: crop, watered: false, grown: false };
+      updateUI();
+      saveGame();
+    }
+
+    function water(index) {
+      if (field[index] && !field[index].watered) {
+        field[index].watered = true;
+        setTimeout(() => {
+          field[index].grown = true;
+          updateUI();
+          saveGame();
+        }, 3000);
+        updateUI();
+        saveGame();
+      }
+    }
+
+    function waterAll() {
+      field.forEach((plot, index) => {
+        if (plot && !plot.watered && !plot.grown) {
+          water(index);
+        }
+      });
+    }
+
+    function harvestAll() {
+      field.forEach((plot, index) => {
+        if (plot && plot.grown) {
+          const crop = plot.type;
+          storage[crop === "carrot" ? "carrots" : crop]++;
+          field[index] = null;
+        }
+      });
+      updateUI();
+      saveGame();
+    }
+
+    function goToBarn() {
+      saveGame();
+      window.location.href = "barn.html";
+    }
+
+    function goToMarket() {
+      saveGame
