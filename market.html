@@ -109,7 +109,7 @@
   <div class="container">
     <div class="sidebar">
       <h2>Market 🏪</h2>
-      <p>Buy seeds, sell crops & goods.</p>
+      <p>Buy seeds, animals & sell goods.</p>
       <button class="farm-btn" onclick="goToFarm()">Return to Farm 🌱</button>
       <button class="barn-btn" onclick="goToBarn()">Go to Barn 🐔</button>
     </div>
@@ -151,6 +151,27 @@
         <div class="item">
           <span>🌾 Wheat Seed (10🪙)</span>
           <button class="buy-btn" onclick="buySeed('wheat', 10)">Buy</button>
+        </div>
+      </div>
+
+      <!-- Buy Animals -->
+      <div class="shop-section">
+        <h3>🐮 Buy Farm Animals</h3>
+        <div class="item">
+          <span>🐔 Chicken (15🪙)</span>
+          <button class="buy-btn" onclick="buyAnimal('chickens', 15)">Buy</button>
+        </div>
+        <div class="item">
+          <span>🐄 Cow (30🪙)</span>
+          <button class="buy-btn" onclick="buyAnimal('cows', 30)">Buy</button>
+        </div>
+        <div class="item">
+          <span>🐑 Sheep (25🪙)</span>
+          <button class="buy-btn" onclick="buyAnimal('sheep', 25)">Buy</button>
+        </div>
+        <div class="item">
+          <span>🐖 Pig (40🪙)</span>
+          <button class="buy-btn" onclick="buyAnimal('pigs', 40)">Buy</button>
         </div>
       </div>
 
@@ -206,6 +227,7 @@
     const pigsEl = document.getElementById("pigs");
 
     const eggsEl = document.getElementById("eggs");
+        const eggsEl = document.getElementById("eggs");
     const milkEl = document.getElementById("milk");
     const woolEl = document.getElementById("wool");
     const baconEl = document.getElementById("bacon");
@@ -213,8 +235,13 @@
     // Load saved data
     let coins = parseInt(localStorage.getItem("coins")) || 20;
     let seeds = JSON.parse(localStorage.getItem("seeds")) || { corn: 0, carrot: 0, wheat: 0 };
-    let storage = JSON.parse(localStorage.getItem("storage")) || { corn: 0, carrot: 0, wheat: 0, eggs: 0, milk: 0, wool: 0, bacon: 0 };
-    let upgrades = JSON.parse(localStorage.getItem("upgrades")) || { barn: false, chickens: 0, cows: 0, sheep: 0, pigs: 0 };
+    let storage = JSON.parse(localStorage.getItem("storage")) || {
+      corn: 0, carrot: 0, wheat: 0,
+      eggs: 0, milk: 0, wool: 0, bacon: 0
+    };
+    let upgrades = JSON.parse(localStorage.getItem("upgrades")) || {
+      barn: false, chickens: 0, cows: 0, sheep: 0, pigs: 0
+    };
 
     function saveGame() {
       localStorage.setItem("coins", coins);
@@ -225,6 +252,7 @@
 
     function updateUI() {
       coinsEl.textContent = coins;
+
       cornSeedsEl.textContent = seeds.corn;
       carrotSeedsEl.textContent = seeds.carrot;
       wheatSeedsEl.textContent = seeds.wheat;
@@ -251,6 +279,17 @@
       }
     }
 
+    function buyAnimal(type, price) {
+      if (coins >= price) {
+        coins -= price;
+        upgrades[type]++;
+        updateUI();
+        saveGame();
+      } else {
+        alert("Not enough coins to buy this animal!");
+      }
+    }
+
     function sellCrop(type, price) {
       if (storage[type] > 0) {
         storage[type]--;
@@ -272,7 +311,9 @@
       window.location.href = "barn.html";
     }
 
+    // Initial UI update
     updateUI();
   </script>
 </body>
 </html>
+
