@@ -140,6 +140,7 @@
 
     let seeds = parseInt(localStorage.getItem("seeds")) || 2;
     let coins = parseInt(localStorage.getItem("coins")) || 10;
+    let storage = JSON.parse(localStorage.getItem("storage")) || { corn: 0 };
     let action = "plant";
 
     const plots = [];
@@ -147,6 +148,7 @@
     function saveGame() {
       localStorage.setItem("seeds", seeds);
       localStorage.setItem("coins", coins);
+      localStorage.setItem("storage", JSON.stringify(storage));
     }
 
     function logMessage(msg) {
@@ -207,7 +209,8 @@
           plot.state = "empty";
           div.textContent = "soil";
           coins += 3;
-          logMessage("Harvested 🌽 and earned 3🪙.");
+          storage.corn++;
+          logMessage("Harvested 🌽 (+1 storage, +3🪙).");
         } else {
           logMessage("Nothing to do here.");
         }
