@@ -6,7 +6,7 @@
   <style>
     body {
       font-family: Arial, sans-serif;
-      background: linear-gradient(#c8facc, #87e18d); /* light green → grassy green */
+      background: linear-gradient(#e8ffe8, #b3ffb3); /* lighter green gradient */
       margin: 0;
       padding: 0;
       display: flex;
@@ -35,7 +35,7 @@
       margin-top: 0;
     }
 
-    .market-btn, .barn-btn {
+    .barn-btn, .market-btn {
       margin-top: 12px;
       display: block;
       width: 100%;
@@ -53,154 +53,164 @@
       display: flex;
       flex-direction: column;
       align-items: center;
+      flex: 1;
     }
 
     .topbar {
       display: flex;
       justify-content: space-between;
-      width: 420px;
+      width: 600px;
       background: #fff;
-      padding: 8px 16px;
+      padding: 10px 16px;
       border-radius: 8px;
       margin-bottom: 20px;
       font-weight: bold;
     }
 
-    .farm-section {
-      background: #f1fff1;
-      padding: 12px;
-      border-radius: 8px;
-      margin-bottom: 20px;
-      width: 420px;
-      text-align: center;
-    }
-
-    .plots {
+    .field {
       display: grid;
-      grid-template-columns: repeat(3, 100px);
-      grid-gap: 12px;
-      justify-content: center;
-      margin-top: 12px;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 16px;
+      width: 600px;
     }
 
     .plot {
-      width: 100px;
-      height: 100px;
-      background: #deb887; /* soil */
-      border-radius: 8px;
+      width: 100%;
+      height: 120px;
+      background: #f5f5dc;
+      border: 2px solid #ccc;
+      border-radius: 10px;
       display: flex;
       justify-content: center;
       align-items: center;
       cursor: pointer;
-      font-size: 24px;
+      font-size: 1.2em;
+      text-align: center;
+      flex-direction: column;
+      padding: 6px;
     }
 
-    .plot:hover {
-      background: #c68c53;
-    }
+    .plot.wheat { background: #fdf5b5; }
+    .plot.corn { background: #fff3c4; }
+    .plot.carrot { background: #ffd6a5; }
+    .plot.watered { border-color: #4caf50; }
   </style>
 </head>
 <body>
   <div class="container">
+    <!-- Sidebar -->
     <div class="sidebar">
       <h2>Farm 🌱</h2>
-      <p>Plant and harvest your crops.</p>
-      <button class="market-btn" onclick="goToMarket()">Go to Market 🏪</button>
+      <p>Plant and grow crops here.</p>
       <button class="barn-btn" onclick="goToBarn()">Go to Barn 🐔</button>
+      <button class="market-btn" onclick="goToMarket()">Go to Market 🏪</button>
     </div>
 
+    <!-- Game Area -->
     <div class="game-area">
       <div class="topbar">
         <div>Coins: <span id="coins">0</span> 🪙</div>
         <div>
-          🌽 <span id="cornSeeds">0</span> |
-          🥕 <span id="carrotSeeds">0</span> |
-          🌾 <span id="wheatSeeds">0</span>
+          🌾 <span id="wheat">0</span> |
+          🌽 <span id="corn">0</span> |
+          🥕 <span id="carrots">0</span>
         </div>
       </div>
 
-      <div class="farm-section">
-        <h3>🌾 Crop Plots</h3>
-        <div class="plots" id="plots">
-          <div class="plot" onclick="plantCrop(0)">+</div>
-          <div class="plot" onclick="plantCrop(1)">+</div>
-          <div class="plot" onclick="plantCrop(2)">+</div>
-          <div class="plot" onclick="plantCrop(3)">+</div>
-          <div class="plot" onclick="plantCrop(4)">+</div>
-          <div class="plot" onclick="plantCrop(5)">+</div>
-        </div>
-      </div>
+      <div class="field" id="field"></div>
     </div>
   </div>
 
   <script>
     const coinsEl = document.getElementById("coins");
-    const cornSeedsEl = document.getElementById("cornSeeds");
-    const carrotSeedsEl = document.getElementById("carrotSeeds");
-    const wheatSeedsEl = document.getElementById("wheatSeeds");
-    const plotsEl = document.getElementById("plots");
+    const wheatEl = document.getElementById("wheat");
+    const cornEl = document.getElementById("corn");
+    const carrotsEl = document.getElementById("carrots");
+    const fieldEl = document.getElementById("field");
 
-    // Load saved data
     let coins = parseInt(localStorage.getItem("coins")) || 20;
-    let seeds = JSON.parse(localStorage.getItem("seeds")) || { corn: 0, carrot: 0, wheat: 0 };
-    let storage = JSON.parse(localStorage.getItem("storage")) || { corn: 0, carrot: 0, wheat: 0, eggs: 0, milk: 0, wool: 0, bacon: 0 };
-    let crops = JSON.parse(localStorage.getItem("crops")) || Array(6).fill(null); // 6 plots
+    let storage = JSON.parse(localStorage.getItem("storage")) || { wheat: 0, corn: 0, carrots: 0 };
+    let field = JSON.parse(localStorage.getItem("field")) || Array(9).fill(null);
 
     function saveGame() {
       localStorage.setItem("coins", coins);
-      localStorage.setItem("seeds", JSON.stringify(seeds));
       localStorage.setItem("storage", JSON.stringify(storage));
-      localStorage.setItem("crops", JSON.stringify(crops));
+      localStorage.setItem("field", JSON.stringify(field));
     }
 
     function updateUI() {
       coinsEl.textContent = coins;
-      cornSeedsEl.textContent = seeds.corn;
-      carrotSeedsEl.textContent = seeds.carrot;
-      wheatSeedsEl.textContent = seeds.wheat;
+      wheatEl.textContent = storage.wheat;
+      cornEl.textContent = storage.corn;
+      carrotsEl.textContent = storage.carrots;
+      renderField();
+    }
 
-      // Update plots
-      plotsEl.querySelectorAll(".plot").forEach((plot, index) => {
-        if (crops[index]) {
-          plot.textContent = crops[index];
+    function renderField() {
+      fieldEl.innerHTML = "";
+      field.forEach((plot, index) => {
+        const div = document.createElement("div");
+        div.className = "plot";
+        
+        if (plot) {
+          div.classList.add(plot.type);
+          if (plot.watered) div.classList.add("watered");
+
+          if (plot.grown) {
+            div.textContent = `✅ ${plot.type}`;
+            div.onclick = () => harvest(index);
+          } else {
+            div.textContent = plot.watered ? "💧 Growing..." : `🌱 ${plot.type}`;
+            div.onclick = () => water(index);
+          }
         } else {
-          plot.textContent = "+";
+          div.textContent = "Empty Plot";
+          div.onclick = () => chooseCrop(index);
         }
+
+        fieldEl.appendChild(div);
       });
     }
 
-    function plantCrop(index) {
-      if (crops[index]) {
-        // Harvest
-        storage[crops[index]]++;
-        crops[index] = null;
-      } else {
-        // Plant menu (basic: just plant corn if available for now)
-        if (seeds.corn > 0) {
-          seeds.corn--;
-          crops[index] = "🌽";
-        } else if (seeds.carrot > 0) {
-          seeds.carrot--;
-          crops[index] = "🥕";
-        } else if (seeds.wheat > 0) {
-          seeds.wheat--;
-          crops[index] = "🌾";
-        } else {
-          alert("No seeds available!");
-        }
+    function chooseCrop(index) {
+      const choice = prompt("Choose a crop to plant: wheat, corn, or carrot").toLowerCase();
+      if (["wheat", "corn", "carrot"].includes(choice)) {
+        field[index] = { type: choice, watered: false, grown: false };
+        updateUI();
+        saveGame();
       }
-      updateUI();
-      saveGame();
     }
 
-    function goToMarket() {
+    function water(index) {
+      if (field[index]) {
+        field[index].watered = true;
+        // Grow after 3 seconds
+        setTimeout(() => {
+          field[index].grown = true;
+          updateUI();
+          saveGame();
+        }, 3000);
+        updateUI();
+        saveGame();
+      }
+    }
+
+    function harvest(index) {
+      const crop = field[index].type;
+      storage[crop === "carrot" ? "carrots" : crop]++;
+      field[index] = null;
+      updateUI();
       saveGame();
-      window.location.href = "market.html";
     }
 
     function goToBarn() {
       saveGame();
       window.location.href = "barn.html";
+    }
+
+    function goToMarket() {
+      saveGame();
+      window.location.href = "market.html";
     }
 
     updateUI();
