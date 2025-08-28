@@ -6,7 +6,7 @@
   <style>
     body {
       font-family: Arial, sans-serif;
-      background: linear-gradient(#ffe6a7, #ffd27f);
+      background: linear-gradient(#fff8dc, #ffe4b5);
       margin: 0;
       padding: 0;
       display: flex;
@@ -26,21 +26,23 @@
 
     .sidebar {
       width: 220px;
-      background: #fffaf5;
+      background: #fffaf0;
       padding: 20px;
       border-right: 2px solid #ccc;
     }
 
-    .sidebar h2 { margin-top: 0; }
+    .sidebar h2 {
+      margin-top: 0;
+    }
 
-    .nav-btn {
-      margin-top: 10px;
+    .farm-btn, .barn-btn {
+      margin-top: 12px;
       display: block;
       width: 100%;
       padding: 10px;
       border: none;
       border-radius: 8px;
-      background: #f57c00;
+      background: #ff9800;
       color: white;
       font-weight: bold;
       cursor: pointer;
@@ -64,127 +66,157 @@
       font-weight: bold;
     }
 
-    .section {
+    .shop-section {
+      background: #fff3e0;
+      padding: 12px;
+      border-radius: 8px;
       margin-bottom: 20px;
-      padding: 15px;
-      background: #fff8e1;
-      border-radius: 10px;
       width: 420px;
-      box-shadow: inset 0 0 6px rgba(0,0,0,0.1);
     }
 
-    .section h3 { margin-top: 0; }
+    .shop-section h3 {
+      margin-top: 0;
+    }
 
     .item {
       display: flex;
       justify-content: space-between;
-      margin-bottom: 10px;
+      align-items: center;
+      padding: 6px 0;
     }
 
-    button {
+    .item button {
+      padding: 6px 10px;
       border: none;
-      padding: 6px 12px;
       border-radius: 6px;
-      font-weight: bold;
       cursor: pointer;
+      font-weight: bold;
     }
 
-    .sell-btn { background: #81c784; color: white; }
-    .buy-btn { background: #4fc3f7; color: white; }
+    .buy-btn {
+      background: #4caf50;
+      color: white;
+    }
+
+    .sell-btn {
+      background: #f44336;
+      color: white;
+    }
   </style>
 </head>
 <body>
   <div class="container">
     <div class="sidebar">
       <h2>Market 🏪</h2>
-      <p>Sell your harvest & buy seeds for planting.</p>
-      <button class="nav-btn" onclick="goToFarm()">Return to Farm 🌱</button>
-      <button class="nav-btn" onclick="goToBarn()">Go to Barn 🐔</button>
+      <p>Buy seeds, sell crops & goods.</p>
+      <button class="farm-btn" onclick="goToFarm()">Return to Farm 🌱</button>
+      <button class="barn-btn" onclick="goToBarn()">Go to Barn 🐔</button>
     </div>
 
     <div class="game-area">
       <div class="topbar">
         <div>Coins: <span id="coins">0</span> 🪙</div>
-        <div>Storage: 🌽 <span id="corn">0</span>, 🥕 <span id="carrot">0</span>, 🌾 <span id="wheat">0</span>, 🥚 <span id="eggs">0</span>, 🥛 <span id="milk">0</span></div>
+        <div>
+          🌽 <span id="cornSeeds">0</span> |
+          🥕 <span id="carrotSeeds">0</span> |
+          🌾 <span id="wheatSeeds">0</span>
+        </div>
       </div>
 
-      <div class="section">
-        <h3>Sell Produce</h3>
-        <div class="item">🌽 Corn (<span id="corn-store">0</span>) <button class="sell-btn" onclick="sell('corn', 3)">Sell (3🪙)</button></div>
-        <div class="item">🥕 Carrot (<span id="carrot-store">0</span>) <button class="sell-btn" onclick="sell('carrot', 4)">Sell (4🪙)</button></div>
-        <div class="item">🌾 Wheat (<span id="wheat-store">0</span>) <button class="sell-btn" onclick="sell('wheat', 5)">Sell (5🪙)</button></div>
-        <div class="item">🥚 Egg (<span id="eggs-store">0</span>) <button class="sell-btn" onclick="sell('eggs', 6)">Sell (6🪙)</button></div>
-        <div class="item">🥛 Milk (<span id="milk-store">0</span>) <button class="sell-btn" onclick="sell('milk', 10)">Sell (10🪙)</button></div>
+      <!-- Buy Seeds -->
+      <div class="shop-section">
+        <h3>🌱 Buy Seeds</h3>
+        <div class="item">
+          <span>🌽 Corn Seed (5🪙)</span>
+          <button class="buy-btn" onclick="buySeed('corn', 5)">Buy</button>
+        </div>
+        <div class="item">
+          <span>🥕 Carrot Seed (8🪙)</span>
+          <button class="buy-btn" onclick="buySeed('carrot', 8)">Buy</button>
+        </div>
+        <div class="item">
+          <span>🌾 Wheat Seed (10🪙)</span>
+          <button class="buy-btn" onclick="buySeed('wheat', 10)">Buy</button>
+        </div>
       </div>
 
-      <div class="section">
-        <h3>Buy Seeds</h3>
-        <div class="item">🌽 Corn Seed (2🪙) <button class="buy-btn" onclick="buySeed('corn', 2)">Buy</button></div>
-        <div class="item">🥕 Carrot Seed (3🪙) <button class="buy-btn" onclick="buySeed('carrot', 3)">Buy</button></div>
-        <div class="item">🌾 Wheat Seed (4🪙) <button class="buy-btn" onclick="buySeed('wheat', 4)">Buy</button></div>
+      <!-- Sell Crops -->
+      <div class="shop-section">
+        <h3>🌾 Sell Crops</h3>
+        <div class="item">
+          <span>🌽 Corn (3🪙)</span>
+          <button class="sell-btn" onclick="sellCrop('corn', 3)">Sell</button>
+        </div>
+        <div class="item">
+          <span>🥕 Carrot (6🪙)</span>
+          <button class="sell-btn" onclick="sellCrop('carrot', 6)">Sell</button>
+        </div>
+        <div class="item">
+          <span>🌾 Wheat (8🪙)</span>
+          <button class="sell-btn" onclick="sellCrop('wheat', 8)">Sell</button>
+        </div>
+      </div>
+
+      <!-- Sell Animal Products -->
+      <div class="shop-section">
+        <h3>🐔 Sell Animal Products</h3>
+        <div class="item">
+          <span>🥚 Egg (4🪙)</span>
+          <button class="sell-btn" onclick="sellCrop('eggs', 4)">Sell</button>
+        </div>
+        <div class="item">
+          <span>🥛 Milk (12🪙)</span>
+          <button class="sell-btn" onclick="sellCrop('milk', 12)">Sell</button>
+        </div>
       </div>
     </div>
   </div>
 
   <script>
     const coinsEl = document.getElementById("coins");
-    const cornEl = document.getElementById("corn");
-    const carrotEl = document.getElementById("carrot");
-    const wheatEl = document.getElementById("wheat");
-    const eggsEl = document.getElementById("eggs");
-    const milkEl = document.getElementById("milk");
+    const cornSeedsEl = document.getElementById("cornSeeds");
+    const carrotSeedsEl = document.getElementById("carrotSeeds");
+    const wheatSeedsEl = document.getElementById("wheatSeeds");
 
-    const cornStore = document.getElementById("corn-store");
-    const carrotStore = document.getElementById("carrot-store");
-    const wheatStore = document.getElementById("wheat-store");
-    const eggsStore = document.getElementById("eggs-store");
-    const milkStore = document.getElementById("milk-store");
-
-    let coins = parseInt(localStorage.getItem("coins")) || 0;
-    let seeds = JSON.parse(localStorage.getItem("seeds")) || { corn:0, carrot:0, wheat:0 };
-    let storage = JSON.parse(localStorage.getItem("storage")) || { corn:0, carrot:0, wheat:0, eggs:0, milk:0 };
+    // Load saved data
+    let coins = parseInt(localStorage.getItem("coins")) || 20;
+    let seeds = JSON.parse(localStorage.getItem("seeds")) || { corn: 0, carrot: 0, wheat: 0 };
+    let storage = JSON.parse(localStorage.getItem("storage")) || { corn: 0, carrot: 0, wheat: 0, eggs: 0, milk: 0 };
+    let upgrades = JSON.parse(localStorage.getItem("upgrades")) || { barn: false, chickens: 0, cows: 0 };
 
     function saveGame() {
       localStorage.setItem("coins", coins);
       localStorage.setItem("seeds", JSON.stringify(seeds));
       localStorage.setItem("storage", JSON.stringify(storage));
+      localStorage.setItem("upgrades", JSON.stringify(upgrades));
     }
 
     function updateUI() {
       coinsEl.textContent = coins;
-      cornEl.textContent = storage.corn;
-      carrotEl.textContent = storage.carrot;
-      wheatEl.textContent = storage.wheat;
-      eggsEl.textContent = storage.eggs;
-      milkEl.textContent = storage.milk;
-
-      cornStore.textContent = storage.corn;
-      carrotStore.textContent = storage.carrot;
-      wheatStore.textContent = storage.wheat;
-      eggsStore.textContent = storage.eggs;
-      milkStore.textContent = storage.milk;
+      cornSeedsEl.textContent = seeds.corn;
+      carrotSeedsEl.textContent = seeds.carrot;
+      wheatSeedsEl.textContent = seeds.wheat;
     }
 
-    function sell(item, price) {
-      if (storage[item] > 0) {
-        storage[item]--;
-        coins += price;
-        saveGame();
+    function buySeed(type, price) {
+      if (coins >= price) {
+        coins -= price;
+        seeds[type]++;
         updateUI();
+        saveGame();
       } else {
-        alert("You don't have any " + item + " to sell!");
+        alert("Not enough coins!");
       }
     }
 
-    function buySeed(crop, price) {
-      if (coins >= price) {
-        coins -= price;
-        seeds[crop]++;
-        saveGame();
+    function sellCrop(type, price) {
+      if (storage[type] > 0) {
+        storage[type]--;
+        coins += price;
         updateUI();
-        alert("Bought 1 " + crop + " seed!");
+        saveGame();
       } else {
-        alert("Not enough coins!");
+        alert("You have none to sell!");
       }
     }
 
