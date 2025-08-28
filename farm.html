@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>Farm Game</title>
+  <title>Your Farm</title>
   <style>
     body {
       font-family: Arial, sans-serif;
@@ -31,12 +31,10 @@
       border-right: 2px solid #ccc;
     }
 
-    .sidebar h2 {
-      margin-top: 0;
-    }
+    .sidebar h2 { margin-top: 0; }
 
-    .market-btn {
-      margin-top: 20px;
+    .nav-btn {
+      margin-top: 10px;
       display: block;
       width: 100%;
       padding: 10px;
@@ -58,7 +56,7 @@
     .topbar {
       display: flex;
       justify-content: space-between;
-      width: 400px;
+      width: 420px;
       background: #fff;
       padding: 8px 16px;
       border-radius: 8px;
@@ -66,9 +64,7 @@
       font-weight: bold;
     }
 
-    .buttons {
-      margin-bottom: 20px;
-    }
+    .buttons { margin-bottom: 20px; }
 
     .buttons button {
       margin: 0 5px;
@@ -112,12 +108,17 @@
       <p>🌱 Plant seeds, 💧 water crops, 🌽 harvest, and 🏪 sell at the market.</p>
       <h3>Crop Log</h3>
       <div id="log"></div>
-      <button class="market-btn" onclick="goToMarket()">Go to Market 🏪</button>
+      <button class="nav-btn" onclick="goToMarket()">Go to Market 🏪</button>
+      <button class="nav-btn" onclick="goToBarn()">Go to Barn 🐔</button>
     </div>
 
     <div class="game-area">
       <div class="topbar">
-        <div>Seeds: <span id="seeds">0</span> 🌱</div>
+        <div>Seeds 🌱: 
+          Corn <span id="seeds-corn">0</span>, 
+          Carrot <span id="seeds-carrot">0</span>, 
+          Wheat <span id="seeds-wheat">0</span>
+        </div>
         <div>Coins: <span id="coins">0</span> 🪙</div>
       </div>
 
@@ -125,7 +126,6 @@
         <button onclick="setAction('plant')" style="background:#81c784">Plant</button>
         <button onclick="setAction('water')" style="background:#4fc3f7">Water</button>
         <button onclick="setAction('harvest')" style="background:#ffb74d">Harvest</button>
-        <button onclick="buySeed()" style="background:#e57373">Buy Seed (5🪙)</button>
       </div>
 
       <div class="farm" id="farm"></div>
@@ -134,43 +134,36 @@
 
   <script>
     const farm = document.getElementById("farm");
-    const seedsEl = document.getElementById("seeds");
-    const coinsEl = document.getElementById("coins");
     const log = document.getElementById("log");
+    const seedsCornEl = document.getElementById("seeds-corn");
+    const seedsCarrotEl = document.getElementById("seeds-carrot");
+    const seedsWheatEl = document.getElementById("seeds-wheat");
+    const coinsEl = document.getElementById("coins");
 
-    // --- Load game state safely ---
-    let seeds = parseInt(localStorage.getItem("seeds")) || 2;
-    let coins = parseInt(localStorage.getItem("coins")) || 10;
-
-    let storage;
-    try {
-      storage = JSON.parse(localStorage.getItem("storage"));
-      if (!storage || typeof storage.corn !== "number") {
-        storage = { corn: 0 };
-      }
-    } catch (e) {
-      console.warn("Storage data corrupted, resetting.", e);
-      storage = { corn: 0 };
-    }
-
+    // load from storage
+    let coins = parseInt(localStorage.getItem("coins")) || 20;
+    let seeds = JSON.parse(localStorage.getItem("seeds")) || { corn: 2, carrot: 1, wheat: 1 };
+    let storage = JSON.parse(localStorage.getItem("storage")) || { corn: 0, carrot: 0, wheat: 0, eggs: 0, milk: 0 };
     let action = "plant";
+
     const plots = [];
 
     function saveGame() {
-      localStorage.setItem("seeds", seeds);
       localStorage.setItem("coins", coins);
+      localStorage.setItem("seeds", JSON.stringify(seeds));
       localStorage.setItem("storage", JSON.stringify(storage));
     }
 
     function logMessage(msg) {
       const time = new Date().toLocaleTimeString();
       log.innerHTML = `[${time}] ${msg}<br>` + log.innerHTML;
-      console.log(msg); // debug log for GitHub Pages
     }
 
     function updateUI() {
-      seedsEl.textContent = seeds;
       coinsEl.textContent = coins;
+      seedsCornEl.textContent = seeds.corn;
+      seedsCarrotEl.textContent = seeds.carrot;
+      seedsWheatEl.textContent = seeds.wheat;
     }
 
     function setAction(a) {
@@ -178,51 +171,49 @@
       logMessage(`Selected action: ${a}`);
     }
 
-    function buySeed() {
-      if (coins >= 5) {
-        coins -= 5;
-        seeds++;
-        updateUI();
-        saveGame();
-        logMessage("Bought a seed 🌱 for 5🪙.");
-      } else {
-        logMessage("Not enough coins to buy a seed.");
-      }
-    }
-
     function createPlot(i) {
       const div = document.createElement("div");
       div.classList.add("plot");
       div.textContent = "soil";
-      const plot = { state: "empty", el: div };
+      const plot = { state: "empty", crop: null, el: div };
       plots.push(plot);
 
       div.addEventListener("click", () => {
-        if (action === "plant" && plot.state === "empty" && seeds > 0) {
-          seeds--;
-          plot.state = "planted";
-          div.textContent = "🌱";
-          setTimeout(() => {
-            if (plot.state === "planted") {
-              plot.state = "grown";
-              div.textContent = "🌽";
-            }
-          }, 5000);
-          logMessage("Planted a seed 🌱.");
+        if (action === "plant" && plot.state === "empty") {
+          let crop = prompt("Which crop? (corn/carrot/wheat)");
+          if (crop && seeds[crop] > 0) {
+            seeds[crop]--;
+            plot.state = "planted";
+            plot.crop = crop;
+            div.textContent = "🌱";
+            logMessage(`Planted ${crop} 🌱.`);
+            setTimeout(() => {
+              if (plot.state === "planted") {
+                plot.state = "grown";
+                if (crop === "corn") div.textContent = "🌽";
+                if (crop === "carrot") div.textContent = "🥕";
+                if (crop === "wheat") div.textContent = "🌾";
+              }
+            }, 5000);
+          } else {
+            logMessage("Not enough seeds!");
+          }
         } else if (action === "water" && plot.state === "planted") {
           logMessage("Watered 🌱. Growth sped up!");
           setTimeout(() => {
             if (plot.state === "planted") {
               plot.state = "grown";
-              div.textContent = "🌽";
+              if (plot.crop === "corn") div.textContent = "🌽";
+              if (plot.crop === "carrot") div.textContent = "🥕";
+              if (plot.crop === "wheat") div.textContent = "🌾";
             }
           }, 2000);
         } else if (action === "harvest" && plot.state === "grown") {
+          storage[plot.crop]++;
+          logMessage(`Harvested ${plot.crop} and stored it.`);
           plot.state = "empty";
+          plot.crop = null;
           div.textContent = "soil";
-          coins += 3;
-          storage.corn++;
-          logMessage("Harvested 🌽 (+1 storage, +3🪙).");
         } else {
           logMessage("Nothing to do here.");
         }
@@ -240,8 +231,12 @@
       window.location.href = "market.html";
     }
 
+    function goToBarn() {
+      saveGame();
+      window.location.href = "barn.html";
+    }
+
     updateUI();
-    console.log("Farm game loaded with:", { seeds, coins, storage });
   </script>
 </body>
 </html>
