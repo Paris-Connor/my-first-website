@@ -10,69 +10,25 @@
       margin: 0;
       padding: 0;
       display: flex;
+      justify-content: center;
+      align-items: flex-start;
       height: 100vh;
     }
 
+    .container {
+      display: flex;
+      background: #ffffffdd;
+      border-radius: 12px;
+      margin: 40px;
+      box-shadow: 0px 4px 12px rgba(0,0,0,0.2);
+      overflow: hidden;
+    }
+
     .sidebar {
-      width: 250px;
-      background: #ffffffcc;
+      width: 220px;
+      background: #f5fff5;
       padding: 20px;
       border-right: 2px solid #ccc;
-      overflow-y: auto;
-    }
-
-    .game-area {
-      flex: 1;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      padding: 20px;
-    }
-
-    .topbar {
-      display: flex;
-      justify-content: space-between;
-      width: 100%;
-      max-width: 700px;
-      background: #fff;
-      padding: 10px 20px;
-      border-radius: 12px;
-      margin-bottom: 20px;
-      font-weight: bold;
-    }
-
-    .buttons {
-      margin-bottom: 20px;
-    }
-
-    .buttons button {
-      margin: 0 5px;
-      padding: 8px 15px;
-      border: none;
-      border-radius: 8px;
-      cursor: pointer;
-      font-weight: bold;
-    }
-
-    .farm {
-      display: grid;
-      grid-template-columns: repeat(4, 100px);
-      gap: 15px;
-    }
-
-    .plot {
-      width: 100px;
-      height: 100px;
-      background: #8b5a2b;
-      border: 2px solid #5c3a1b;
-      border-radius: 12px;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      font-size: 28px;
-      cursor: pointer;
-      color: white;
-      font-weight: bold;
     }
 
     .sidebar h2 {
@@ -91,23 +47,185 @@
       font-weight: bold;
       cursor: pointer;
     }
+
+    .game-area {
+      padding: 20px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+
+    .topbar {
+      display: flex;
+      justify-content: space-between;
+      width: 400px;
+      background: #fff;
+      padding: 8px 16px;
+      border-radius: 8px;
+      margin-bottom: 20px;
+      font-weight: bold;
+    }
+
+    .buttons {
+      margin-bottom: 20px;
+    }
+
+    .buttons button {
+      margin: 0 5px;
+      padding: 6px 12px;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+      font-weight: bold;
+    }
+
+    .farm {
+      display: grid;
+      grid-template-columns: repeat(4, 80px);
+      gap: 12px;
+      background: #d7f5d7;
+      padding: 15px;
+      border-radius: 12px;
+      box-shadow: inset 0 0 8px rgba(0,0,0,0.15);
+    }
+
+    .plot {
+      width: 80px;
+      height: 80px;
+      background: #8b5a2b;
+      border: 2px solid #5c3a1b;
+      border-radius: 8px;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      font-size: 24px;
+      color: white;
+      font-weight: bold;
+      cursor: pointer;
+    }
   </style>
 </head>
 <body>
-  <div class="sidebar">
-    <h2>Your Farm</h2>
-    <p>🌱 Plant seeds, 💧 water crops, 🌽 harvest, and 🏪 sell at the market.</p>
-    <h3>Crop Log</h3>
-    <div id="log"></div>
-    <button class="market-btn" onclick="goToMarket()">Go to Market 🏪</button>
-  </div>
-
-  <div class="game-area">
-    <div class="topbar">
-      <div>Seeds: <span id="seeds">0</span> 🌱</div>
-      <div>Coins: <span id="coins">0</span> 🪙</div>
+  <div class="container">
+    <div class="sidebar">
+      <h2>Your Farm</h2>
+      <p>🌱 Plant seeds, 💧 water crops, 🌽 harvest, and 🏪 sell at the market.</p>
+      <h3>Crop Log</h3>
+      <div id="log"></div>
+      <button class="market-btn" onclick="goToMarket()">Go to Market 🏪</button>
     </div>
 
-    <div class="buttons">
-      <button onclick="setAction('plant')" style="background:#81c784">Plant</button>
-      <button onclick="setAction('water')" style="background:#4fc3f
+    <div class="game-area">
+      <div class="topbar">
+        <div>Seeds: <span id="seeds">0</span> 🌱</div>
+        <div>Coins: <span id="coins">0</span> 🪙</div>
+      </div>
+
+      <div class="buttons">
+        <button onclick="setAction('plant')" style="background:#81c784">Plant</button>
+        <button onclick="setAction('water')" style="background:#4fc3f7">Water</button>
+        <button onclick="setAction('harvest')" style="background:#ffb74d">Harvest</button>
+        <button onclick="buySeed()" style="background:#e57373">Buy Seed (5🪙)</button>
+      </div>
+
+      <div class="farm" id="farm"></div>
+    </div>
+  </div>
+
+  <script>
+    const farm = document.getElementById("farm");
+    const seedsEl = document.getElementById("seeds");
+    const coinsEl = document.getElementById("coins");
+    const log = document.getElementById("log");
+
+    let seeds = parseInt(localStorage.getItem("seeds")) || 2;
+    let coins = parseInt(localStorage.getItem("coins")) || 10;
+    let action = "plant";
+
+    const plots = [];
+
+    function saveGame() {
+      localStorage.setItem("seeds", seeds);
+      localStorage.setItem("coins", coins);
+    }
+
+    function logMessage(msg) {
+      const time = new Date().toLocaleTimeString();
+      log.innerHTML = `[${time}] ${msg}<br>` + log.innerHTML;
+    }
+
+    function updateUI() {
+      seedsEl.textContent = seeds;
+      coinsEl.textContent = coins;
+    }
+
+    function setAction(a) {
+      action = a;
+      logMessage(`Selected action: ${a}`);
+    }
+
+    function buySeed() {
+      if (coins >= 5) {
+        coins -= 5;
+        seeds++;
+        updateUI();
+        saveGame();
+        logMessage("Bought a seed 🌱 for 5🪙.");
+      } else {
+        logMessage("Not enough coins to buy a seed.");
+      }
+    }
+
+    function createPlot(i) {
+      const div = document.createElement("div");
+      div.classList.add("plot");
+      div.textContent = "soil";
+      const plot = { state: "empty", el: div };
+      plots.push(plot);
+
+      div.addEventListener("click", () => {
+        if (action === "plant" && plot.state === "empty" && seeds > 0) {
+          seeds--;
+          plot.state = "planted";
+          div.textContent = "🌱";
+          setTimeout(() => {
+            if (plot.state === "planted") {
+              plot.state = "grown";
+              div.textContent = "🌽";
+            }
+          }, 5000);
+          logMessage("Planted a seed 🌱.");
+        } else if (action === "water" && plot.state === "planted") {
+          logMessage("Watered 🌱. Growth sped up!");
+          setTimeout(() => {
+            if (plot.state === "planted") {
+              plot.state = "grown";
+              div.textContent = "🌽";
+            }
+          }, 2000);
+        } else if (action === "harvest" && plot.state === "grown") {
+          plot.state = "empty";
+          div.textContent = "soil";
+          coins += 3;
+          logMessage("Harvested 🌽 and earned 3🪙.");
+        } else {
+          logMessage("Nothing to do here.");
+        }
+        updateUI();
+        saveGame();
+      });
+
+      farm.appendChild(div);
+    }
+
+    for (let i = 0; i < 12; i++) createPlot(i);
+
+    function goToMarket() {
+      saveGame();
+      window.location.href = "market.html";
+    }
+
+    updateUI();
+  </script>
+</body>
+</html>
