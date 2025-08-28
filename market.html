@@ -6,7 +6,7 @@
   <style>
     body {
       font-family: Arial, sans-serif;
-      background: linear-gradient(#fff9e6, #ffe0b2);
+      background: linear-gradient(#a8e6a1, #90ee90);
       margin: 0;
       padding: 0;
       display: flex;
@@ -16,33 +16,78 @@
     }
 
     .container {
-      margin: 40px;
+      display: flex;
       background: #ffffffdd;
       border-radius: 12px;
-      padding: 20px;
+      margin: 40px;
       box-shadow: 0px 4px 12px rgba(0,0,0,0.2);
-      width: 400px;
+      overflow: hidden;
     }
 
-    h2 {
+    .sidebar {
+      width: 220px;
+      background: #f5fff5;
+      padding: 20px;
+      border-right: 2px solid #ccc;
+    }
+
+    .sidebar h2 {
       margin-top: 0;
     }
 
-    .crop {
+    .back-btn {
+      margin-top: 20px;
+      display: block;
+      width: 100%;
+      padding: 10px;
+      border: none;
+      border-radius: 8px;
+      background: #81c784;
+      color: white;
+      font-weight: bold;
+      cursor: pointer;
+    }
+
+    .game-area {
+      padding: 20px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+
+    .topbar {
+      display: flex;
+      justify-content: space-between;
+      width: 400px;
+      background: #fff;
+      padding: 8px 16px;
+      border-radius: 8px;
+      margin-bottom: 20px;
+      font-weight: bold;
+    }
+
+    .market-items {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    .item {
+      background: #f9fff9;
+      padding: 12px;
+      border-radius: 8px;
+      box-shadow: 0px 2px 6px rgba(0,0,0,0.1);
       display: flex;
       justify-content: space-between;
       align-items: center;
-      padding: 8px;
-      margin-bottom: 10px;
-      background: #f7f7f7;
-      border-radius: 8px;
+      width: 320px;
     }
 
-    button {
+    .item button {
       padding: 6px 12px;
       border: none;
       border-radius: 6px;
-      background: #ff9800;
+      background: #4caf50;
       color: white;
       font-weight: bold;
       cursor: pointer;
@@ -51,55 +96,55 @@
 </head>
 <body>
   <div class="container">
-    <h2>🌽 Market</h2>
-    <p>Coins: <span id="coins">0</span> 🪙</p>
-    <div id="inventory"></div>
-    <button onclick="goBack()">⬅️ Back to Farm</button>
+    <div class="sidebar">
+      <h2>Market</h2>
+      <p>Sell your crops for coins, then head back to the farm!</p>
+      <button class="back-btn" onclick="goBack()">Return to Farm 🌱</button>
+    </div>
+
+    <div class="game-area">
+      <div class="topbar">
+        <div>Coins: <span id="coins">0</span> 🪙</div>
+        <div>Storage: <span id="corn">0</span> 🌽</div>
+      </div>
+
+      <div class="market-items">
+        <div class="item">
+          <span>🌽 Corn — Sell Price: 5🪙</span>
+          <button onclick="sellCorn()">Sell</button>
+        </div>
+      </div>
+    </div>
   </div>
 
   <script>
-    const coinsEl = document.getElementById("coins");
-    const invEl = document.getElementById("inventory");
-
     let coins = parseInt(localStorage.getItem("coins")) || 0;
-    let inventory = JSON.parse(localStorage.getItem("inventory")) || {};
+    let storage = JSON.parse(localStorage.getItem("storage")) || { corn: 0 };
+
+    const coinsEl = document.getElementById("coins");
+    const cornEl = document.getElementById("corn");
 
     function updateUI() {
       coinsEl.textContent = coins;
-      invEl.innerHTML = "";
-
-      for (let crop in inventory) {
-        const amount = inventory[crop];
-        if (amount > 0) {
-          const div = document.createElement("div");
-          div.className = "crop";
-          div.innerHTML = `
-            ${crop} x${amount}
-            <button onclick="sell('${crop}')">Sell</button>
-          `;
-          invEl.appendChild(div);
-        }
-      }
-
-      if (Object.keys(inventory).length === 0) {
-        invEl.innerHTML = "<p>No crops yet.</p>";
-      }
+      cornEl.textContent = storage.corn;
     }
 
-    function sell(crop) {
-      if (inventory[crop] > 0) {
-        inventory[crop]--;
-        coins += 5; // price for corn
+    function sellCorn() {
+      if (storage.corn > 0) {
+        storage.corn--;
+        coins += 5;
         localStorage.setItem("coins", coins);
-        localStorage.setItem("inventory", JSON.stringify(inventory));
+        localStorage.setItem("storage", JSON.stringify(storage));
         updateUI();
+      } else {
+        alert("No corn to sell!");
       }
     }
 
     function goBack() {
       localStorage.setItem("coins", coins);
-      localStorage.setItem("inventory", JSON.stringify(inventory));
-      window.location.href = "farm.html";
+      localStorage.setItem("storage", JSON.stringify(storage));
+      window.location.href = "index.html";
     }
 
     updateUI();
