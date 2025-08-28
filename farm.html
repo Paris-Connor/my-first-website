@@ -1,115 +1,262 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<title>Farm Plots</title>
-<style>
-  body {
-    font-family: Arial, sans-serif;
-    background: linear-gradient(#c8facc, #87e18d);
-    display: flex;
-    justify-content: center;
-    align-items: flex-start;
-    height: 100vh;
-    margin: 0;
-    padding: 20px;
-  }
+  <meta charset="UTF-8">
+  <title>Farm</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: linear-gradient(#e8ffe8, #b3ffb3);
+      margin: 0;
+      padding: 0;
+      display: flex;
+      justify-content: center;
+      align-items: flex-start;
+      height: 100vh;
+    }
 
-  .farm-grid {
-    display: grid;
-    grid-template-columns: repeat(4, 80px);
-    grid-gap: 12px;
-  }
+    .container {
+      display: flex;
+      background: #ffffffdd;
+      border-radius: 12px;
+      margin: 40px;
+      box-shadow: 0px 4px 12px rgba(0,0,0,0.2);
+      overflow: hidden;
+    }
 
-  .plot {
-    width: 80px;
-    height: 80px;
-    background: #8b4513; /* brown for empty plot */
-    border-radius: 6px;
-    position: relative;
-    cursor: pointer;
-  }
+    .sidebar {
+      width: 220px;
+      background: #f0fff0;
+      padding: 20px;
+      border-right: 2px solid #ccc;
+    }
 
-  .plot .crop-options {
-    display: none;
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background: rgba(255,255,255,0.9);
-    border-radius: 6px;
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    align-items: center;
-    gap: 4px;
-  }
+    .sidebar h2 {
+      margin-top: 0;
+    }
 
-  .plot .crop-options button {
-    padding: 4px 6px;
-    font-size: 12px;
-    cursor: pointer;
-  }
+    .barn-btn, .market-btn {
+      margin-top: 12px;
+      display: block;
+      width: 100%;
+      padding: 10px;
+      border: none;
+      border-radius: 8px;
+      background: #4caf50;
+      color: white;
+      font-weight: bold;
+      cursor: pointer;
+    }
 
-  .plot .crop {
-    font-size: 2em;
-    text-align: center;
-    line-height: 80px;
-  }
-</style>
+    .game-area {
+      padding: 20px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      flex: 1;
+    }
+
+    .topbar {
+      display: flex;
+      justify-content: space-between;
+      width: 600px;
+      background: #fff;
+      padding: 10px 16px;
+      border-radius: 8px;
+      margin-bottom: 20px;
+      font-weight: bold;
+    }
+
+    .field {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 16px;
+      width: 600px;
+    }
+
+    .plot {
+      width: 100%;
+      height: 120px;
+      background: #8b5e3c; /* brown soil */
+      border: 2px solid #ccc;
+      border-radius: 10px;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      cursor: pointer;
+      font-size: 1.2em;
+      text-align: center;
+      flex-direction: column;
+      position: relative;
+      color: #333;
+    }
+
+    .plot.wheat { background: #fdf5b5; }
+    .plot.corn { background: #fff3c4; }
+    .plot.carrot { background: #ffd6a5; }
+    .plot.watered { border-color: #4caf50; }
+
+    .crop-selector {
+      position: absolute;
+      bottom: 4px;
+      background: white;
+      border: 1px solid #ccc;
+      border-radius: 6px;
+      display: flex;
+      gap: 6px;
+      padding: 4px;
+      z-index: 10;
+    }
+
+    .crop-btn {
+      padding: 4px 6px;
+      font-size: 0.9em;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+      background: #eee;
+    }
+
+    .crop-btn:hover {
+      background: #c8e6c9;
+    }
+  </style>
 </head>
 <body>
-  <div class="farm-grid" id="farmGrid">
-    <!-- Plots will be generated here -->
+  <div class="container">
+    <!-- Sidebar -->
+    <div class="sidebar">
+      <h2>Farm 🌱</h2>
+      <p>Plant and grow crops here.</p>
+      <button class="barn-btn" onclick="goToBarn()">Go to Barn 🐔</button>
+      <button class="market-btn" onclick="goToMarket()">Go to Market 🏪</button>
+    </div>
+
+    <!-- Game Area -->
+    <div class="game-area">
+      <div class="topbar">
+        <div>Coins: <span id="coins">0</span> 🪙</div>
+        <div>
+          🌾 <span id="wheat">0</span> |
+          🌽 <span id="corn">0</span> |
+          🥕 <span id="carrots">0</span>
+        </div>
+      </div>
+
+      <div class="field" id="field"></div>
+    </div>
   </div>
 
-<script>
-const farmGrid = document.getElementById("farmGrid");
-const crops = {
-  wheat: "🌾",
-  carrot: "🥕",
-  corn: "🌽",
-  tomato: "🍅"
-};
+  <script>
+    const coinsEl = document.getElementById("coins");
+    const wheatEl = document.getElementById("wheat");
+    const cornEl = document.getElementById("corn");
+    const carrotsEl = document.getElementById("carrots");
+    const fieldEl = document.getElementById("field");
 
-// Create 12 plots
-const plotCount = 12;
-const plots = [];
+    let coins = parseInt(localStorage.getItem("coins")) || 20;
+    let storage = JSON.parse(localStorage.getItem("storage")) || { wheat: 0, corn: 0, carrots: 0 };
+    let field = JSON.parse(localStorage.getItem("field")) || Array(9).fill(null);
 
-for (let i = 0; i < plotCount; i++) {
-  const plot = document.createElement("div");
-  plot.className = "plot";
+    function saveGame() {
+      localStorage.setItem("coins", coins);
+      localStorage.setItem("storage", JSON.stringify(storage));
+      localStorage.setItem("field", JSON.stringify(field));
+    }
 
-  // Crop display
-  const cropEl = document.createElement("div");
-  cropEl.className = "crop";
-  plot.appendChild(cropEl);
+    function updateUI() {
+      coinsEl.textContent = coins;
+      wheatEl.textContent = storage.wheat;
+      cornEl.textContent = storage.corn;
+      carrotsEl.textContent = storage.carrots;
+      renderField();
+    }
 
-  // Crop selection buttons
-  const cropOptions = document.createElement("div");
-  cropOptions.className = "crop-options";
-  for (const key in crops) {
-    const btn = document.createElement("button");
-    btn.textContent = crops[key];
-    btn.onclick = (e) => {
-      e.stopPropagation();
-      cropEl.textContent = crops[key];
-      cropOptions.style.display = "none";
-      plot.dataset.crop = key;
-    };
-    cropOptions.appendChild(btn);
-  }
-  plot.appendChild(cropOptions);
+    function renderField() {
+      fieldEl.innerHTML = "";
+      field.forEach((plot, index) => {
+        const div = document.createElement("div");
+        div.className = "plot";
 
-  // Click to show crop options
-  plot.addEventListener("click", () => {
-    cropOptions.style.display = cropOptions.style.display === "flex" ? "none" : "flex";
-  });
+        if (plot) {
+          div.classList.add(plot.type);
+          if (plot.watered) div.classList.add("watered");
 
-  farmGrid.appendChild(plot);
-  plots.push(plot);
-}
-</script>
+          if (plot.grown) {
+            div.textContent = `✅ ${plot.type}`;
+            div.onclick = () => harvest(index);
+          } else {
+            div.textContent = plot.watered ? "💧 Growing..." : `🌱 ${plot.type}`;
+            div.onclick = () => water(index);
+          }
+        } else {
+          div.onclick = (e) => showCropSelector(e, index);
+        }
+
+        fieldEl.appendChild(div);
+      });
+    }
+
+    function showCropSelector(e, index) {
+      // Remove any existing selectors
+      document.querySelectorAll('.crop-selector').forEach(el => el.remove());
+
+      const selector = document.createElement("div");
+      selector.className = "crop-selector";
+
+      ["wheat", "corn", "carrot"].forEach(crop => {
+        const btn = document.createElement("button");
+        btn.className = "crop-btn";
+        btn.textContent = crop;
+        btn.onclick = (event) => {
+          event.stopPropagation();
+          plantCrop(index, crop);
+          selector.remove();
+        };
+        selector.appendChild(btn);
+      });
+
+      e.currentTarget.appendChild(selector);
+    }
+
+    function plantCrop(index, crop) {
+      field[index] = { type: crop, watered: false, grown: false };
+      updateUI();
+      saveGame();
+    }
+
+    function water(index) {
+      if (field[index]) {
+        field[index].watered = true;
+        setTimeout(() => {
+          field[index].grown = true;
+          updateUI();
+          saveGame();
+        }, 3000);
+        updateUI();
+        saveGame();
+      }
+    }
+
+    function harvest(index) {
+      const crop = field[index].type;
+      storage[crop === "carrot" ? "carrots" : crop]++;
+      field[index] = null;
+      updateUI();
+      saveGame();
+    }
+
+    function goToBarn() {
+      saveGame();
+      window.location.href = "barn.html";
+    }
+
+    function goToMarket() {
+      saveGame();
+      window.location.href = "market.html";
+    }
+
+    updateUI();
+  </script>
 </body>
 </html>
