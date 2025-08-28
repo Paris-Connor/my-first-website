@@ -6,7 +6,7 @@
   <style>
     body {
       font-family: Arial, sans-serif;
-      background: linear-gradient(#b7f0b1, #90ee90);
+      background: linear-gradient(#a8e6a1, #90ee90);
       margin: 0;
       padding: 0;
       display: flex;
@@ -15,7 +15,7 @@
 
     .sidebar {
       width: 250px;
-      background: #fff;
+      background: #ffffffcc;
       padding: 20px;
       border-right: 2px solid #ccc;
       overflow-y: auto;
@@ -54,10 +54,6 @@
       font-weight: bold;
     }
 
-    .buttons button:hover {
-      opacity: 0.9;
-    }
-
     .farm {
       display: grid;
       grid-template-columns: repeat(4, 100px);
@@ -92,4 +88,26 @@
       border-radius: 8px;
       background: #4caf50;
       color: white;
-      font-weight: bold
+      font-weight: bold;
+      cursor: pointer;
+    }
+  </style>
+</head>
+<body>
+  <div class="sidebar">
+    <h2>Your Farm</h2>
+    <p>🌱 Plant seeds, 💧 water crops, 🌽 harvest, and 🏪 sell at the market.</p>
+    <h3>Crop Log</h3>
+    <div id="log"></div>
+    <button class="market-btn" onclick="goToMarket()">Go to Market 🏪</button>
+  </div>
+
+  <div class="game-area">
+    <div class="topbar">
+      <div>Seeds: <span id="seeds">0</span> 🌱</div>
+      <div>Coins: <span id="coins">0</span> 🪙</div>
+    </div>
+
+    <div class="buttons">
+      <button onclick="setAction('plant')" style="background:#81c784">Plant</button>
+      <button onclick="setAction('water')" style="background:#4fc3f
