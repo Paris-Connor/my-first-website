@@ -5,114 +5,91 @@
   <title>Farm Game</title>
   <style>
     body {
-      background: #90ee90; /* green grass background */
       font-family: Arial, sans-serif;
-      text-align: center;
+      background: linear-gradient(#b7f0b1, #90ee90);
       margin: 0;
+      padding: 0;
+      display: flex;
+      height: 100vh;
+    }
+
+    .sidebar {
+      width: 250px;
+      background: #fff;
+      padding: 20px;
+      border-right: 2px solid #ccc;
+      overflow-y: auto;
+    }
+
+    .game-area {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
       padding: 20px;
     }
 
-    h1 {
-      margin-bottom: 10px;
+    .topbar {
+      display: flex;
+      justify-content: space-between;
+      width: 100%;
+      max-width: 700px;
+      background: #fff;
+      padding: 10px 20px;
+      border-radius: 12px;
+      margin-bottom: 20px;
+      font-weight: bold;
     }
 
-    p {
+    .buttons {
       margin-bottom: 20px;
+    }
+
+    .buttons button {
+      margin: 0 5px;
+      padding: 8px 15px;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      font-weight: bold;
+    }
+
+    .buttons button:hover {
+      opacity: 0.9;
     }
 
     .farm {
       display: grid;
-      grid-template-columns: repeat(5, 80px);
-      grid-gap: 10px;
-      justify-content: center;
-      margin: 20px auto;
+      grid-template-columns: repeat(4, 100px);
+      gap: 15px;
     }
 
     .plot {
-      width: 80px;
-      height: 80px;
-      background: #8b4513;   /* dirt brown */
-      border: 2px solid #654321;
-      border-radius: 8px;
-      cursor: pointer;
+      width: 100px;
+      height: 100px;
+      background: #8b5a2b;
+      border: 2px solid #5c3a1b;
+      border-radius: 12px;
       display: flex;
-      align-items: center;
       justify-content: center;
-      font-size: 32px;
-    }
-
-    .menu {
-      margin-top: 20px;
-    }
-
-    .menu a {
+      align-items: center;
+      font-size: 28px;
+      cursor: pointer;
+      color: white;
       font-weight: bold;
-      font-size: 18px;
-      text-decoration: none;
-      color: #333;
-      background: #f4d35e;
-      padding: 8px 14px;
-      border-radius: 10px;
-      border: 2px solid #c99800;
     }
 
-    .menu a:hover {
-      background: #f0c43d;
-    }
-  </style>
-</head>
-<body>
-  <h1>🌱 Simple Farm Game</h1>
-  <p>Click a plot to plant crops. Wait, then click again to harvest!</p>
-
-  <div class="farm" id="farm"></div>
-
-  <div class="menu">
-    <a href="market.html">Go to Market 🛒</a>
-  </div>
-
-  <script>
-    const farm = document.getElementById("farm");
-    const crops = ["🌽", "🥕", "🍅"];
-
-    // Shared inventory with market
-    let inventory = JSON.parse(localStorage.getItem("inventory")) || [];
-
-    // Create 15 plots
-    for (let i = 0; i < 15; i++) {
-      const plot = document.createElement("div");
-      plot.classList.add("plot");
-      plot.dataset.state = "empty";
-      plot.addEventListener("click", () => handleClick(plot));
-      farm.appendChild(plot);
+    .sidebar h2 {
+      margin-top: 0;
     }
 
-    function handleClick(plot) {
-      if (plot.dataset.state === "empty") {
-        // Plant seed
-        plot.textContent = "🌱";
-        plot.dataset.state = "growing";
-
-        // Grow crop after 3 seconds
-        setTimeout(() => {
-          if (plot.dataset.state === "growing") {
-            const crop = crops[Math.floor(Math.random() * crops.length)];
-            plot.textContent = crop;
-            plot.dataset.state = "grown";
-          }
-        }, 3000);
-
-      } else if (plot.dataset.state === "grown") {
-        // Harvest crop
-        const crop = plot.textContent;
-        inventory.push(crop);
-        localStorage.setItem("inventory", JSON.stringify(inventory));
-
-        // Reset plot
-        plot.textContent = "";
-        plot.dataset.state = "empty";
-      }
-    }
-  </script>
-</body>
-</html>
+    .market-btn {
+      margin-top: 20px;
+      display: block;
+      width: 100%;
+      padding: 10px;
+      border: none;
+      border-radius: 8px;
+      background: #4caf50;
+      color: white;
+      font-weight: bold
