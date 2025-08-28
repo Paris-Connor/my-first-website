@@ -1,341 +1,105 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8" />
-<title>Raccoon Fishing — Mini Game</title>
-<meta name="viewport" content="width=device-width, initial-scale=1" />
-<style>
-  :root { --W: 900px; --H: 520px; }
+  <meta charset="UTF-8">
+  <title>Raccoon Fishing Game</title>
+  <style>
+    body {
+      margin: 0;
+      background: #87ceeb;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+    }
 
-  * { box-sizing: border-box; }
-  body {
-    margin: 0;
-    height: 100vh;
-    display: grid;
-    place-items: center;
-    background: #bfe3ff;
-    font-family: system-ui, -apple-system, Segoe UI, Roboto, sans-serif;
-    user-select: none;
-  }
+    .game {
+      position: relative;
+      width: 800px;
+      height: 500px;
+      background: linear-gradient(to bottom, #4fc3f7 40%, #01579b 60%);
+      border: 10px solid #654321;
+      border-radius: 20px;
+      overflow: hidden;
+    }
 
-  .game {
-    position: relative;
-    width: min(96vw, var(--W));
-    aspect-ratio: 900/520;
-    background: linear-gradient(#c9ecff 0 40%, #89c1ff 40% 100%);
-    border: 10px solid #2b4a64;
-    border-radius: 16px;
-    overflow: hidden;
-  }
+    /* Fisher raccoon */
+    .raccoon {
+      position: absolute;
+      top: 10px;
+      left: 350px;
+      font-size: 60px;
+      text-align: center;
+    }
+    .raccoon .hat {
+      font-size: 25px;
+      position: absolute;
+      top: -10px;
+      left: 10px;
+    }
+    .raccoon .overalls {
+      display: block;
+      font-size: 35px;
+    }
 
-  /* Water */
-  .water {
-    position: absolute; inset: 40% 0 0 0;
-    background:
-      radial-gradient(1200px 80px at 50% 0%, rgba(255,255,255,.25), transparent 60%),
-      repeating-linear-gradient(0deg, rgba(255,255,255,.15) 0 2px, transparent 2px 10px),
-      linear-gradient(#64aaf7 0%, #2f6fd6 60%, #1e4aa5 100%);
-  }
+    /* Fishing line */
+    .line {
+      position: absolute;
+      top: 90px;
+      left: 385px;
+      width: 2px;
+      height: 250px;
+      background: black;
+    }
 
-  /* Dock */
-  .dock {
-    position: absolute; left: 0; top: 38%;
-    width: 42%; height: 16%;
-    background:
-      linear-gradient(90deg,
-        #7a4f2a 0 6%, #6b4324 6% 12%, #7a4f2a 12% 18%, #6b4324 18% 24%,
-        #7a4f2a 24% 30%, #6b4324 30% 36%, #7a4f2a 36% 42%, #6b4324 42% 48%,
-        #7a4f2a 48% 54%, #6b4324 54% 60%, #7a4f2a 60% 66%, #6b4324 66% 72%,
-        #7a4f2a 72% 78%, #6b4324 78% 84%, #7a4f2a 84% 90%, #6b4324 90% 96%,
-        #7a4f2a 96% 100%);
-    border-top-right-radius: 12px;
-    filter: drop-shadow(0 6px 0 rgba(0,0,0,.15));
-  }
-  .post {
-    position: absolute; bottom: -10%;
-    width: 18px; height: 70%;
-    background: #694225;
-    border: 3px solid #4c2f19;
-    border-bottom: none; border-radius: 8px 8px 0 0;
-    box-shadow: inset 0 8px rgba(0,0,0,.12);
-  }
-  .post:nth-child(1){ left: 10%; }
-  .post:nth-child(2){ left: 30%; }
-  .post:nth-child(3){ left: 50%; }
-  .post:nth-child(4){ left: 70%; }
+    /* Hook */
+    .hook {
+      position: absolute;
+      top: 340px;
+      left: 376px;
+      font-size: 30px;
+    }
 
-  /* Raccoon (emoji + outfit) */
-  .raccoon {
-    position: absolute; left: 28%; top: 27%;
-    width: 90px; height: 110px;
-    display: grid; place-items: center;
-    transform: translateX(-50%);
-    pointer-events: none;
-  }
-  .raccoon .char { font-size: 66px; line-height: 1; transform: translateY(6px); }
-  .hat {
-    position: absolute; top: -8px; left: 50%;
-    transform: translateX(-50%) rotate(-6deg);
-    font-size: 36px;
-  }
-  /* Overalls (blue body + straps) */
-  .overalls {
-    position: absolute; bottom: 16px; left: 50%;
-    width: 64px; height: 48px; transform: translateX(-50%);
-    background: #3b82f6; border: 3px solid #1e4fb0; border-radius: 6px 6px 10px 10px;
-  }
-  .overalls::before, .overalls::after {
-    content:""; position: absolute; top: -16px; width: 8px; height: 22px;
-    background: #3b82f6; border: 3px solid #1e4fb0; border-bottom: none; border-radius: 6px 6px 0 0;
-  }
-  .overalls::before{ left: 12px; } .overalls::after { right: 12px; }
+    /* Fish */
+    .fish {
+      position: absolute;
+      font-size: 40px;
+      bottom: 100px;
+      animation: swim 10s linear infinite;
+    }
+    .fish.reverse {
+      transform: scaleX(-1);
+      animation: swimBack 12s linear infinite;
+    }
 
-  /* Rod + line + hook */
-  .rod {
-    position: absolute; top: 8px; left: 50%;
-    width: 120px; height: 6px; background: #805d3a; border-radius: 6px;
-    transform-origin: left center; transform: translateX(-4px) rotate(-10deg);
-    box-shadow: 0 2px 0 rgba(0,0,0,.2) inset;
-  }
-  .line {
-    position: absolute; left: calc(50% + 110px); top: 10px;
-    width: 2px; height: 0; background: #e7edf7;
-    box-shadow: 0 0 2px rgba(255,255,255,.8);
-  }
-  .hook {
-    position: absolute; left: calc(50% + 102px); top: 10px;
-    font-size: 28px; transform: translateX(-50%);
-  }
-
-  /* Fish */
-  .fish {
-    position: absolute; top: 50%;
-    font-size: 40px; filter: drop-shadow(0 3px 0 rgba(0,0,0,.15));
-    white-space: pre; will-change: transform, left;
-  }
-  .right { animation: swimR var(--spd, 12s) linear infinite; }
-  .left  { animation: swimL var(--spd, 14s) linear infinite; transform: scaleX(-1); }
-  @keyframes swimR { from { left: -80px; } to { left: 100%; } }
-  @keyframes swimL { from { left: 100%; } to { left: -80px; } }
-
-  /* Seafloor: dunes + decor (SVG for universal support) */
-  .seafloor { position: absolute; inset: auto 0 0 0; height: 24%; }
-  .sandWave { position: absolute; inset: auto 0 0 0; height: 120px; }
-  .sandWave svg { width: 100%; height: 120px; display: block; }
-  .plant, .rock, .star, .shell, .crab { position: absolute; bottom: 12%; font-size: 30px; }
-  .plant { animation: sway 3s ease-in-out infinite alternate; }
-  @keyframes sway { from { transform: rotate(6deg); } to { transform: rotate(-6deg); } }
-  .crab {
-    bottom: 16%; font-size: 34px;
-    animation: crawl var(--cspd, 22s) linear infinite;
-  }
-  .crab.flip { transform: scaleX(-1); animation-name: crawlR; }
-  @keyframes crawl { from { left: -60px; } to { left: calc(100% + 60px); } }
-  @keyframes crawlR { from { left: calc(100% + 60px); } to { left: -60px; } }
-
-  /* UI */
-  .hud {
-    position: absolute; top: 10px; right: 12px;
-    display: flex; gap: 14px; align-items: center;
-    padding: 8px 12px; background: rgba(0,0,0,.25);
-    color: #fff; border-radius: 10px; font-weight: 700;
-  }
-  .tip {
-    position: absolute; top: 10px; left: 12px;
-    padding: 8px 12px; border-radius: 10px;
-    background: rgba(0,0,0,.25); color: #fff; font-weight: 600;
-  }
-  .btn {
-    position: absolute; bottom: 10px; right: 10px;
-    padding: 10px 14px; border-radius: 10px;
-    background: #1f6feb; color: #fff; font-weight: 700; border: none; cursor: pointer;
-    box-shadow: 0 4px 0 rgba(0,0,0,.15);
-  }
-
-  /* Catch flash */
-  .flash {
-    position: absolute; pointer-events: none;
-    width: 14px; height: 14px; border-radius: 50%;
-    background: rgba(255,255,255,.9);
-    box-shadow: 0 0 20px 6px rgba(255,255,255,.9);
-    animation: pop .35s ease-out forwards;
-  }
-  @keyframes pop { from { opacity: .9; transform: scale(.6); } to { opacity: 0; transform: scale(1.6); } }
-
-  /* Accessibility: reduce motion */
-  @media (prefers-reduced-motion: reduce) {
-    .right, .left, .plant, .crab { animation-duration: 0s !important; }
-  }
-</style>
+    @keyframes swim {
+      from { left: -80px; }
+      to { left: 850px; }
+    }
+    @keyframes swimBack {
+      from { left: 850px; }
+      to { left: -80px; }
+    }
+  </style>
 </head>
 <body>
-  <div class="game" id="game" aria-label="Raccoon Fishing Game">
-    <div class="tip">Press <b>Space</b> or <b>Click/Tap</b> to cast 🎣</div>
-    <div class="hud">Score: <span id="score">0</span></div>
-    <button class="btn" id="castBtn" aria-label="Cast line">Cast 🎣</button>
-
-    <!-- Dock + posts -->
-    <div class="dock">
-      <div class="post"></div><div class="post"></div><div class="post"></div><div class="post"></div>
-    </div>
-
+  <div class="game">
     <!-- Raccoon fisher -->
-    <div class="raccoon" id="raccoon">
+    <div class="raccoon">
+      🦝
       <div class="hat">👒</div>
-      <div class="char">🦝</div>
-      <div class="overalls" aria-hidden="true"></div>
-      <div class="rod"></div>
-      <div class="line" id="line" aria-hidden="true"></div>
-      <div class="hook" id="hook" role="img" aria-label="hook">🪝</div>
+      <div class="overalls">👖</div>
     </div>
 
-    <!-- Water -->
-    <div class="water"></div>
+    <!-- Fishing line & hook -->
+    <div class="line"></div>
+    <div class="hook">🎣</div>
 
-    <!-- Fish lane (fish are appended here by JS) -->
-    <div id="fish-layer" aria-hidden="true"></div>
-
-    <!-- Seafloor + decorations -->
-    <div class="seafloor">
-      <div class="plant" style="left:8%;">🌿</div>
-      <div class="plant" style="left:16%;">🌿</div>
-      <div class="plant" style="left:78%;">🌿</div>
-      <div class="plant" style="left:88%;">🌿</div>
-      <div class="rock" style="left:28%;">🪨</div>
-      <div class="rock" style="left:42%;">🪨</div>
-      <div class="star" style="left:55%;">⭐</div>
-      <div class="shell" style="left:65%;">🐚</div>
-      <div class="crab" style="left:-40px; --cspd: 24s;">🦀</div>
-      <div class="crab flip" style="left:100%;">🦀</div>
-
-      <!-- Curvy sand drawn with SVG (reliable on GitHub Pages) -->
-      <div class="sandWave">
-        <svg viewBox="0 0 900 120" preserveAspectRatio="none">
-          <path d="M0 40 Q120 80 240 40 T480 40 T720 40 T900 40 V120 H0 Z" fill="#f0d487"/>
-        </svg>
-      </div>
-    </div>
+    <!-- Fish swimming only in water -->
+    <div class="fish" style="top:300px; animation-duration:14s;">🐟</div>
+    <div class="fish reverse" style="top:350px; animation-duration:12s;">🐠</div>
+    <div class="fish" style="top:250px; animation-duration:18s;">🐡</div>
+    <div class="fish reverse" style="top:320px; animation-duration:16s;">🐠</div>
   </div>
-
-<script>
-(() => {
-  const game = document.getElementById('game');
-  const line = document.getElementById('line');
-  const hook = document.getElementById('hook');
-  const scoreEl = document.getElementById('score');
-  const castBtn = document.getElementById('castBtn');
-  const fishLayer = document.getElementById('fish-layer');
-
-  const rectGame = () => game.getBoundingClientRect();
-  const waterTop  = () => rectGame().height * 0.40; // y where water starts
-  const waterBottom = () => rectGame().height * 0.975; // near bottom
-  const hookBaseTop = () => hook.offsetTop; // inside raccoon
-  const maxLineLen = () => {
-    const hookTopInGame = hook.getBoundingClientRect().top - rectGame().top;
-    return Math.max(40, waterBottom() - hookTopInGame - 16);
-  };
-
-  let casting = false, retracting = false, caughtThisCast = false;
-  let score = 0;
-
-  function setLineHeight(px){
-    line.style.height = px + 'px';
-    // Keep hook at line end (same container)
-    hook.style.top = (10 + px) + 'px';
-  }
-
-  function cast(){
-    if (casting || retracting) return;
-    casting = true; caughtThisCast = false;
-
-    const target = maxLineLen();
-    setLineHeight(0);
-    // extend down
-    const downMS = 450;
-    animateValue(0, target, downMS, setLineHeight, () => {
-      // retract up
-      retracting = true;
-      animateValue(target, 0, 380, setLineHeight, () => {
-        casting = false; retracting = false;
-      });
-    });
-  }
-
-  function animateValue(from, to, ms, onFrame, onDone){
-    const start = performance.now();
-    function tick(now){
-      const t = Math.min(1, (now - start) / ms);
-      const val = from + (to - from) * t;
-      onFrame(val);
-      if (t < 1) requestAnimationFrame(tick);
-      else onDone && onDone();
-    }
-    requestAnimationFrame(tick);
-  }
-
-  function overlap(a, b){
-    return !(a.right < b.left || a.left > b.right || a.bottom < b.top || a.top > b.bottom);
-  }
-
-  function flashAt(x, y){
-    const f = document.createElement('div');
-    f.className = 'flash';
-    f.style.left = x + 'px';
-    f.style.top  = y + 'px';
-    game.appendChild(f);
-    setTimeout(() => f.remove(), 350);
-  }
-
-  /* Fish spawning */
-  const fishEmojis = ['🐟','🐠','🐡'];
-  function spawnFish(){
-    const f = document.createElement('div');
-    const dirLeft = Math.random() < 0.5;
-    f.className = 'fish ' + (dirLeft ? 'left' : 'right');
-    f.textContent = fishEmojis[(Math.random() * fishEmojis.length)|0];
-    const lane = 50 + Math.random() * (rectGame().height * 0.55 - 60); // inside water
-    f.style.top = lane + 'px';
-    f.style.setProperty('--spd', (11 + Math.random()*7).toFixed(2) + 's');
-    fishLayer.appendChild(f);
-    // Remove when it finishes an animation cycle (roughly), then respawn
-    setTimeout(() => { if (f.isConnected) f.remove(); spawnFish(); }, 14000);
-  }
-  for (let i=0;i<6;i++) spawnFish();
-
-  /* Collision loop */
-  function checkCollisions(){
-    if ((casting || retracting) && !caughtThisCast){
-      const hookRect = hook.getBoundingClientRect();
-      const fishes = Array.from(fishLayer.querySelectorAll('.fish'));
-      for (const fish of fishes){
-        const r = fish.getBoundingClientRect();
-        if (overlap(hookRect, r)){
-          caughtThisCast = true;
-          score += 1; scoreEl.textContent = score;
-          flashAt((r.left+r.right)/2 - rectGame().left, (r.top+r.bottom)/2 - rectGame().top);
-          fish.remove(); // despawn caught fish
-          spawnFish();   // keep the population up
-          // quick retract on catch
-          animateValue(parseFloat(line.style.height||'0'), 0, 220, setLineHeight, () => {
-            casting = false; retracting = false;
-          });
-          break;
-        }
-      }
-    }
-    requestAnimationFrame(checkCollisions);
-  }
-  requestAnimationFrame(checkCollisions);
-
-  /* Controls */
-  castBtn.addEventListener('click', cast);
-  window.addEventListener('pointerdown', (e) => { if (!e.target.closest('.btn')) cast(); });
-  window.addEventListener('keydown', (e) => { if (e.code === 'Space') { e.preventDefault(); cast(); } });
-
-  /* Resize safety: keep hook attached after resizes/rotations */
-  new ResizeObserver(() => { setLineHeight(parseFloat(line.style.height || '0')); }).observe(game);
-
-})();
-</script>
 </body>
 </html>
